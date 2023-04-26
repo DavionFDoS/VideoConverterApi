@@ -27,5 +27,7 @@ public enum VideoCodecs
     [EnumMember(Value = "dnxhr")]
     DNxHR,
     [EnumMember(Value = "copy")]
-    Copy
+    Copy,
+    [EnumMember(Value = null)]
+    Null
 }

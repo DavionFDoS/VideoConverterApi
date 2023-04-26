@@ -5,7 +5,9 @@ namespace VideoConverterApi.Models;
 public class CommandArguments
 {
     public string? InputFileName { get; set; }
-    public string? BitrateValue { get; set; }
+    public string? VideoBitrate { get; set; }
+    public string? AudioBitrate { get; set; }
+    public string? Crf { get; set; }
     public string? StartTime { get; set; }
     public string? EndTime { get; set; }
     public string? RotateAngle { get; set; }
