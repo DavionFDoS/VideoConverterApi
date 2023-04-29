@@ -59,6 +59,38 @@ app.MapPost("/converttomkvwithnoarguments", async (CommandArguments commandArgum
 .WithName("ConvertToMKVWithNoArguments")
 .WithOpenApi();
 
+app.MapPost("/converttoflvwithnoarguments", async (CommandArguments commandArguments) =>
+{
+    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    await commandsHandler.ConvertToFLVWithNoArguments();
+})
+.WithName("ConvertToFLVWithNoArguments")
+.WithOpenApi();
+
+app.MapPost("/convertto3gpwithnoarguments", async (CommandArguments commandArguments) =>
+{
+    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    await commandsHandler.ConvertTo3GPWithNoArguments();
+})
+.WithName("ConvertTo3GPWithNoArguments")
+.WithOpenApi();
+
+app.MapPost("/converttompegwithnoarguments", async (CommandArguments commandArguments) =>
+{
+    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    await commandsHandler.ConvertToMPEGWithNoArguments();
+})
+.WithName("ConvertToMPEGWithNoArguments")
+.WithOpenApi();
+
+app.MapPost("/converttowmvwithnoarguments", async (CommandArguments commandArguments) =>
+{
+    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    await commandsHandler.ConvertToWMVWithNoArguments();
+})
+.WithName("ConvertToWMVWithNoArguments")
+.WithOpenApi();
+
 app.MapPost("/converttomp4witharguments", async (CommandArguments commandArguments) =>
 {
     var commandsHandler = new FFMpegCommandHandler(commandArguments);

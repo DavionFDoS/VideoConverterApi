@@ -21,7 +21,6 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
             .WriteTo.File("logs.txt")
             .CreateLogger();
     }
-
     public async Task ConvertToMP4WithNoArguments()
     {
         var inputFileName = _commandArguments.InputFileName;
@@ -32,9 +31,10 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
 
         var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}output.mp4")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mp4")
             .WithValidation(CommandResultValidation.None)
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
@@ -59,9 +59,10 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
 
         var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}output.avi")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.avi")
             .WithValidation(CommandResultValidation.None)
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
@@ -80,15 +81,17 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
     {
         var inputFileName = _commandArguments.InputFileName;
 
+
         if (inputFileName is null)
         {
             return;
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
 
         var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}output.webm")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.webm")
             .WithValidation(CommandResultValidation.None)
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
@@ -113,9 +116,10 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
 
         var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}outputSimple.mov")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mov")
             .WithValidation(CommandResultValidation.None)
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
@@ -140,9 +144,10 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
 
         var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}outputSimple.mkv")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mkv")
             .WithValidation(CommandResultValidation.None)
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
@@ -156,6 +161,118 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         _logger.Information("Convert to MKV with no arguments command executed succesfully");
+    }
+    public async Task ConvertToFLVWithNoArguments()
+    {
+        var inputFileName = _commandArguments.InputFileName;
+
+        if (inputFileName is null)
+        {
+            return;
+        }
+
+        var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
+
+        var cmd = Cli.Wrap("ffmpeg")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.flv")
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing convert to FLV with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Convert to FLV with no arguments command executed succesfully");
+    }
+    public async Task ConvertTo3GPWithNoArguments()
+    {
+        var inputFileName = _commandArguments.InputFileName;
+
+        if (inputFileName is null)
+        {
+            return;
+        }
+
+        var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
+
+        var cmd = Cli.Wrap("ffmpeg")
+            .WithArguments($"-i {inputFilePath} -c:v libx264 -b:v 512k -c:a aac -b:a 128k -ar 8000 -ac 1 {_videosFolderName}{guid}.3gp")
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing convert to 3GP with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Convert to 3GP with no arguments command executed succesfully");
+    }
+    public async Task ConvertToMPEGWithNoArguments()
+    {
+        var inputFileName = _commandArguments.InputFileName;
+
+        if (inputFileName is null)
+        {
+            return;
+        }
+
+        var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
+
+        var cmd = Cli.Wrap("ffmpeg")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mpeg")
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing convert to MPEG with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Convert to MPEG with no arguments command executed succesfully");
+    }
+    public async Task ConvertToWMVWithNoArguments()
+    {
+        var inputFileName = _commandArguments.InputFileName;
+
+        if (inputFileName is null)
+        {
+            return;
+        }
+
+        var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
+
+        var cmd = Cli.Wrap("ffmpeg")
+            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.wmv")
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing convert to WMV with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Convert to VMV with no arguments command executed succesfully");
     }
     public async Task ConvertToMP4WithArguments()
     {
@@ -175,6 +292,8 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         var audioBitrate = _commandArguments.AudioBitrate ?? "128k";
         var guid = Guid.NewGuid();
         var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mp4";
+        var cts = new CancellationTokenSource();
+        var token = cts.Token;
 
         var cmd = Cli.Wrap("ffmpeg")
             .WithArguments(arguments)
@@ -183,6 +302,12 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (token.IsCancellationRequested)
+        {
+            cts?.Cancel();
+            _logger.Error("Command execution was cancelled");
+        }
 
         if (cmdResult.ExitCode != 0)
         {
@@ -335,12 +460,14 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
-        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "prores_ks";
+        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "libx264"; //to change
         var videoBitrate = _commandArguments.VideoBitrate ?? "12000k";
-        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "pcm_s24le";
-        var audioBitrate = _commandArguments.AudioBitrate ?? "320k";
+        var preset = _commandArguments.Preset.GetEnumMemberValue() ?? "slow";
+        var crf = _commandArguments.Crf ?? "22";
+        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "aac";
+        var audioBitrate = _commandArguments.AudioBitrate ?? "192k";
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -profile:v 3 -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mov";
+        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf}  -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mkv";
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
@@ -361,12 +488,12 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to MOV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            _logger.Error("Error executing convert to MKV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             _logger.Error("Command arguments was {arguments}", arguments);
             throw new Exception("Error executing ffmpeg command");
         }
 
-        _logger.Information("Convert to MOV with arguments command executed succesfully");
+        _logger.Information("Convert to MKV with arguments command executed succesfully");
     }
     public async Task ReverseVideoAsync()
     {
