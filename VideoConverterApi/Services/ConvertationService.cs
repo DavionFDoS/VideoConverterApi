@@ -9,16 +9,16 @@ using VideoConverterApi.Extensions;
 
 namespace VideoConverterApi.Services;
 
-public class FFMpegCommandHandler : IFFMpegCommandHandler
+public class ConvertationService : IConvertationService
 {
     private readonly CommandArguments _commandArguments;
     private readonly Serilog.ILogger _logger;
     private readonly string _videosFolderName = "Videos/";
-    public FFMpegCommandHandler(CommandArguments commandArguments)
+    public ConvertationService(CommandArguments commandArguments)
     {
         _commandArguments = commandArguments;
         _logger = new LoggerConfiguration()
-            .WriteTo.File("logs.txt")
+            .WriteTo.File("ConvertionServiceLogs.txt")
             .CreateLogger();
     }
     public async Task ConvertToMP4WithNoArguments()
@@ -274,6 +274,61 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
 
         _logger.Information("Convert to VMV with no arguments command executed succesfully");
     }
+    public async Task ConvertToGIFWithNoArguments()
+    {
+        var inputFileName = _commandArguments.InputFileName;
+
+        if (inputFileName is null)
+        {
+            return;
+        }
+
+        var inputFilePath = $"Videos/{inputFileName}";
+        var guid = Guid.NewGuid();
+
+        var cmd = Cli.Wrap("ffmpeg")
+            .WithArguments($"-i {inputFilePath} -vf scale=320:-1 -r 10 -f gif {_videosFolderName}{guid}.gif")
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing convert to GIF with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Convert to GIF with no arguments command executed succesfully");
+    }
+    public async Task ConvertToSeriesOfImages()
+    {
+        var inputFileName = _commandArguments.InputFileName;
+
+        if (inputFileName is null)
+        {
+            return;
+        }
+
+        var inputFilePath = $"Videos/{inputFileName}";
+
+        var cmd = Cli.Wrap("ffmpeg")
+            .WithArguments($"-i {inputFilePath} -r 1/5 {_videosFolderName}image_%03d.jpg")
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing convert to series of images command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Convert to series of images command executed succesfully");
+    }
     public async Task ConvertToMP4WithArguments()
     {
         var inputFileName = _commandArguments.InputFileName;
@@ -494,26 +549,5 @@ public class FFMpegCommandHandler : IFFMpegCommandHandler
         }
 
         _logger.Information("Convert to MKV with arguments command executed succesfully");
-    }
-    public async Task ReverseVideoAsync()
-    {
-        var inputFileName = _commandArguments.InputFileName;
-        var inputFilePath = $"Videos/{inputFileName}";
-
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} -vf reverse -af areverse {_videosFolderName}outputReversed.mp4")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
-
-        var cmdResult = await cmd.ExecuteBufferedAsync();
-
-        if (cmdResult.ExitCode != 0)
-        {
-            _logger.Error("Error executing reverse video command. Exit code: {ExitCode}", cmdResult.ExitCode);
-            throw new Exception("Error executing ffmpeg command");
-        }
-
-        _logger.Information("Reverse video command executed succesfully");
     }
 }

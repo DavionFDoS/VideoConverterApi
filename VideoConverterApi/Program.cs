@@ -6,10 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddSingleton(IFFMpegCommandHandler, FFMpegCommandHandler());
 
 var app = builder.Build();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -21,7 +19,7 @@ app.UseHttpsRedirection();
 
 app.MapPost("/converttomp4withnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToMP4WithNoArguments();
 })
 .WithName("ConvertToMP4WithNoArguments")
@@ -29,7 +27,7 @@ app.MapPost("/converttomp4withnoarguments", async (CommandArguments commandArgum
 
 app.MapPost("/converttoaviwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToAVIWithNoArguments();
 })
 .WithName("ConvertToAVIWithNoArguments")
@@ -37,7 +35,7 @@ app.MapPost("/converttoaviwithnoarguments", async (CommandArguments commandArgum
 
 app.MapPost("/converttowebmwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToWebMWithNoArguments();
 })
 .WithName("ConvertToWebMWithNoArguments")
@@ -45,7 +43,7 @@ app.MapPost("/converttowebmwithnoarguments", async (CommandArguments commandArgu
 
 app.MapPost("/converttomovwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToMOVWithNoArguments();
 })
 .WithName("ConvertToMOVWithNoArguments")
@@ -53,7 +51,7 @@ app.MapPost("/converttomovwithnoarguments", async (CommandArguments commandArgum
 
 app.MapPost("/converttomkvwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToMKVWithNoArguments();
 })
 .WithName("ConvertToMKVWithNoArguments")
@@ -61,7 +59,7 @@ app.MapPost("/converttomkvwithnoarguments", async (CommandArguments commandArgum
 
 app.MapPost("/converttoflvwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToFLVWithNoArguments();
 })
 .WithName("ConvertToFLVWithNoArguments")
@@ -69,7 +67,7 @@ app.MapPost("/converttoflvwithnoarguments", async (CommandArguments commandArgum
 
 app.MapPost("/convertto3gpwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertTo3GPWithNoArguments();
 })
 .WithName("ConvertTo3GPWithNoArguments")
@@ -77,7 +75,7 @@ app.MapPost("/convertto3gpwithnoarguments", async (CommandArguments commandArgum
 
 app.MapPost("/converttompegwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToMPEGWithNoArguments();
 })
 .WithName("ConvertToMPEGWithNoArguments")
@@ -85,15 +83,31 @@ app.MapPost("/converttompegwithnoarguments", async (CommandArguments commandArgu
 
 app.MapPost("/converttowmvwithnoarguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToWMVWithNoArguments();
 })
 .WithName("ConvertToWMVWithNoArguments")
 .WithOpenApi();
 
+app.MapPost("/converttogifwithnoarguments", async (CommandArguments commandArguments) =>
+{
+    var commandsHandler = new ConvertationService(commandArguments);
+    await commandsHandler.ConvertToGIFWithNoArguments();
+})
+.WithName("ConvertToGIFWithNoArguments")
+.WithOpenApi();
+
+app.MapPost("/converttoseriesofimages", async (CommandArguments commandArguments) =>
+{
+    var commandsHandler = new ConvertationService(commandArguments);
+    await commandsHandler.ConvertToSeriesOfImages();
+})
+.WithName("ConvertToSeriesOfImages")
+.WithOpenApi();
+
 app.MapPost("/converttomp4witharguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToMP4WithArguments();
 })
 .WithName("ConvertToMP4WithArguments")
@@ -101,7 +115,7 @@ app.MapPost("/converttomp4witharguments", async (CommandArguments commandArgumen
 
 app.MapPost("/converttoaviwitharguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToAVIWithArguments();
 })
 .WithName("ConvertToAVIWithArguments")
@@ -109,7 +123,7 @@ app.MapPost("/converttoaviwitharguments", async (CommandArguments commandArgumen
 
 app.MapPost("/converttowebmwitharguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToWebMWithArguments();
 })
 .WithName("ConvertToWebMWithArguments")
@@ -117,15 +131,15 @@ app.MapPost("/converttowebmwitharguments", async (CommandArguments commandArgume
 
 app.MapPost("/converttomovwitharguments", async (CommandArguments commandArguments) =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new ConvertationService(commandArguments);
     await commandsHandler.ConvertToMOVWithArguments();
 })
 .WithName("ConvertToMOVWithArguments")
 .WithOpenApi();
 
-app.MapPost("/reversevideo", async (CommandArguments commandArguments) =>
+app.MapPost("/reversevideo", async () =>
 {
-    var commandsHandler = new FFMpegCommandHandler(commandArguments);
+    var commandsHandler = new VideoToolsService();
     await commandsHandler.ReverseVideoAsync();
 })
 .WithName("ReverseVideo")
