@@ -137,12 +137,37 @@ app.MapPost("/converttomovwitharguments", async (CommandArguments commandArgumen
 .WithName("ConvertToMOVWithArguments")
 .WithOpenApi();
 
-app.MapPost("/reversevideo", async () =>
+app.MapPost("/reversevideo", async (ReverseVideoArguments reverseVideoArguments) =>
 {
-    var commandsHandler = new VideoToolsService();
-    await commandsHandler.ReverseVideoAsync();
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ReverseVideoAsync(reverseVideoArguments);
 })
 .WithName("ReverseVideo")
+.WithOpenApi();
+
+app.MapPost("/cropvideo", async (CropVideoArguments cropVideoArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.CropVideoAsync(cropVideoArguments);
+})
+.WithName("CropVideo")
+.WithOpenApi();
+
+app.MapPost("/cutvideo", async (CutVideoArguments cutVideoArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.CutVideoAsync(cutVideoArguments);
+})
+.WithName("CutVideo")
+.WithOpenApi();
+
+app.MapPost("/precalculatevideosize", (SizeCalculationVariables variables) =>
+{
+    var sizePrecalculationService = new SizePrecalculationService();
+    var precalculatedSize = sizePrecalculationService.CalculateSize(variables);
+    return precalculatedSize;
+})
+.WithName("PrecalculateVideoSize")
 .WithOpenApi();
 
 app.Run();

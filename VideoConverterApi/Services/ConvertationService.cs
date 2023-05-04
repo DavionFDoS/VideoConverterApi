@@ -6,6 +6,7 @@ using VideoConverterApi.Interfaces;
 using Microsoft.OpenApi.Extensions;
 using VideoConverterApi.Enums;
 using VideoConverterApi.Extensions;
+using System;
 
 namespace VideoConverterApi.Services;
 
@@ -14,12 +15,22 @@ public class ConvertationService : IConvertationService
     private readonly CommandArguments _commandArguments;
     private readonly Serilog.ILogger _logger;
     private readonly string _videosFolderName = "Videos/";
+    private readonly MediaMetadataService _mediaMetadataService = new();
     public ConvertationService(CommandArguments commandArguments)
     {
         _commandArguments = commandArguments;
         _logger = new LoggerConfiguration()
             .WriteTo.File("ConvertionServiceLogs.txt")
             .CreateLogger();
+    }
+
+    private Command WrapCommand(string arguments)
+    {
+        return Cli.Wrap("ffmpeg")
+            .WithArguments(arguments)
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
     }
     public async Task ConvertToMP4WithNoArguments()
     {
@@ -30,14 +41,10 @@ public class ConvertationService : IConvertationService
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mp4")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mp4");        
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -59,13 +66,11 @@ public class ConvertationService : IConvertationService
         }
 
         var inputFilePath = $"Videos/{inputFileName}";
+        var metadata = _mediaMetadataService.GetMediaMetadata(inputFilePath);
+        _logger.Information(metadata.ToString());
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.avi")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.avi");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -74,7 +79,8 @@ public class ConvertationService : IConvertationService
             _logger.Error("Error executing convert to AVI with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
-
+        metadata = _mediaMetadataService.GetMediaMetadata($"{ _videosFolderName}{guid}.avi");
+        _logger.Information(metadata.ToString());
         _logger.Information("Convert to AVI with no arguments command executed succesfully");
     }
     public async Task ConvertToWebMWithNoArguments()
@@ -90,11 +96,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.webm")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.webm");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -118,11 +120,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mov")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mov");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -146,11 +144,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mkv")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mkv");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -174,11 +168,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.flv")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.flv");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -202,11 +192,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} -c:v libx264 -b:v 512k -c:a aac -b:a 128k -ar 8000 -ac 1 {_videosFolderName}{guid}.3gp")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} -c:v libx264 -b:v 512k -c:a aac -b:a 128k -ar 8000 -ac 1 {_videosFolderName}{guid}.3gp");      
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -230,11 +216,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.mpeg")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mpeg");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -258,11 +240,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} {_videosFolderName}{guid}.wmv")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.wmv");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -286,11 +264,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"Videos/{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} -vf scale=320:-1 -r 10 -f gif {_videosFolderName}{guid}.gif")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand($"-i {inputFilePath} -vf scale=320:-1 -r 10 -f gif {_videosFolderName}{guid}.gif");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -313,12 +287,8 @@ public class ConvertationService : IConvertationService
 
         var inputFilePath = $"Videos/{inputFileName}";
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments($"-i {inputFilePath} -r 1/5 {_videosFolderName}image_%03d.jpg")
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
-
+        var cmd = WrapCommand($"-i {inputFilePath} -r 1/5 {_videosFolderName}image_%03d.jpg");
+        
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
         if (cmdResult.ExitCode != 0)
@@ -350,11 +320,7 @@ public class ConvertationService : IConvertationService
         var cts = new CancellationTokenSource();
         var token = cts.Token;
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand(arguments);
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -394,11 +360,7 @@ public class ConvertationService : IConvertationService
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand(arguments);
 
         var cmdResult = await cmd.ExecuteBufferedAsync(token);
 
@@ -439,11 +401,7 @@ public class ConvertationService : IConvertationService
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand(arguments);
 
         var cmdResult = await cmd.ExecuteBufferedAsync(token);
 
@@ -482,11 +440,7 @@ public class ConvertationService : IConvertationService
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand(arguments);
 
         var cmdResult = await cmd.ExecuteBufferedAsync(token);
 
@@ -527,11 +481,7 @@ public class ConvertationService : IConvertationService
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
 
-        var cmd = Cli.Wrap("ffmpeg")
-            .WithArguments(arguments)
-            .WithValidation(CommandResultValidation.None)
-            .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
-            .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
+        var cmd = WrapCommand(arguments);
 
         var cmdResult = await cmd.ExecuteBufferedAsync(token);
 

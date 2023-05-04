@@ -11,14 +11,14 @@ public class MediaMetadataService
 
 		return new MediaMetadata()
 		{
-			Title = mediaInfo.General.Title,
-			FileExtension = mediaInfo.General.format,
-			Duration = mediaInfo.General.Duration / 1000,
+			Size = mediaInfo.General.Size,
+			FileExtension = mediaInfo.General.Format,
+			Duration = (double)mediaInfo.General.Duration / 1000,
 			Bitrate = mediaInfo.General.BitRate,
-			CodecId = mediaInfo.General.CodecId,
+			CodecId = mediaInfo.Video[0].CodecId,
 			VideoBitRate = mediaInfo.Video[0].bitRate,
-			Height = mediaInfo.General.height,
-			Width = mediaInfo.General.width,
+			Height = mediaInfo.Video[0].Height,
+			Width = mediaInfo.Video[0].Width,
 			FrameRate = mediaInfo.General.frameRate,
 			AudioCodecId = mediaInfo.Audio[0].CodecId,
 			AudioBitRate = mediaInfo.Audio[0].bitRate,
