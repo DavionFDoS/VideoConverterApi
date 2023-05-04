@@ -1,8 +1,7 @@
 ﻿namespace VideoConverterApi.Models;
 
-public class CutVideoArguments
+public class CutVideoArguments : InputFileArguments
 {
-    public string? InputFileName { get; set; }
     public int FromHours { get; set; }
     public int FromMinutes { get; set; }
     public int FromSeconds { get; set; }

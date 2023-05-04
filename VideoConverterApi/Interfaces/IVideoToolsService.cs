@@ -8,18 +8,18 @@ public interface IVideoToolsService
     Task AddSubtitlesAsync();
     Task AddWatermarkAsync();
     Task ChangeAudioBitrateAsync(ChangeAudioBitrateArguments changeAudioBitrateArguments);
-    Task ChangeAudioVolumeAsync();
+    Task ChangeAudioVolumeAsync(ChangeAudioVolumeArguments changeAudioVolumeArguments);
     Task ChangeVideoBitrateAsync(ChangeVideoBitrateArguments changeVideoBitrateArguments);
     Task ChangeVideoResolutionAsync();
-    Task ChangeVideoSpeedAsync();
+    Task ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoSpeedArguments);
     Task CropVideoAsync(CropVideoArguments cropVideoArguments);
     Task CutVideoAsync(CutVideoArguments cutVideoArguments);
-    Task ExtractAudioAsync();
-    Task ExtractSingleFrameAsync();
+    Task ExtractAudioAsync(InputFileArguments inputFileArguments);
+    Task ExtractSingleFrameAsync(ExtractSingleFrameArguments extractSingleFrameArguments);
     Task MergeVideosAsync();
     Task ReflectVideoAsync(ReflectVideoArguments reflectVideoArguments);
-    Task RemoveAudioAsync(RemoveVideoArguments removeVideoArguments);
-    Task ReverseVideoAsync(ReverseVideoArguments reverseVideoArguments);
+    Task RemoveAudioAsync(InputFileArguments inputFileArguments);
+    Task ReverseVideoAsync(InputFileArguments inputFileArguments);
     Task RotateVideoByAngleAsync(RotateVideoArguments rotateVideoArguments);
-    Task WebOptimizeVideoAsync();
+    Task WebOptimizeVideoAsync(InputFileArguments inputFileArguments);
 }

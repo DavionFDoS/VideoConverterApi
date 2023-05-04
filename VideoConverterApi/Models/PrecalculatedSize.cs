@@ -2,6 +2,6 @@
 
 public class PrecalculatedSize
 {
-    public int SizeInBytes { get; set; }
-    public int SizeInMegaBytes { get; set; }
+    public int SizeInBits { get; set; }
+    public double SizeInMegaBytes { get; set; }
 }

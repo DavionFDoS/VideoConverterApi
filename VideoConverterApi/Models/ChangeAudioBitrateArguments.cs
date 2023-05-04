@@ -1,5 +1,6 @@
 ﻿namespace VideoConverterApi.Models;
 
-public class ChangeAudioBitrateArguments
+public class ChangeAudioBitrateArguments : InputFileArguments
 {
+    public int AudioBitrate { get; set;}
 }

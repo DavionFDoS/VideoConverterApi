@@ -137,10 +137,10 @@ app.MapPost("/converttomovwitharguments", async (CommandArguments commandArgumen
 .WithName("ConvertToMOVWithArguments")
 .WithOpenApi();
 
-app.MapPost("/reversevideo", async (ReverseVideoArguments reverseVideoArguments) =>
+app.MapPost("/reversevideo", async (InputFileArguments inputFileArguments) =>
 {
     var videoToolsService = new VideoToolsService();
-    await videoToolsService.ReverseVideoAsync(reverseVideoArguments);
+    await videoToolsService.ReverseVideoAsync(inputFileArguments);
 })
 .WithName("ReverseVideo")
 .WithOpenApi();
@@ -159,6 +159,78 @@ app.MapPost("/cutvideo", async (CutVideoArguments cutVideoArguments) =>
     await videoToolsService.CutVideoAsync(cutVideoArguments);
 })
 .WithName("CutVideo")
+.WithOpenApi();
+
+app.MapPost("/reflectvideo", async (ReflectVideoArguments reflectVideoArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ReflectVideoAsync(reflectVideoArguments);
+})
+.WithName("ReflectVideo")
+.WithOpenApi();
+
+app.MapPost("/removeaudio", async (InputFileArguments inputFileArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.RemoveAudioAsync(inputFileArguments);
+})
+.WithName("RemoveAudio")
+.WithOpenApi();
+
+app.MapPost("/changevideobitrate", async (ChangeVideoBitrateArguments changeVideoBitrateArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ChangeVideoBitrateAsync(changeVideoBitrateArguments);
+})
+.WithName("ChangeVideoBitrate")
+.WithOpenApi();
+
+app.MapPost("/changeaudiobitrate", async (ChangeAudioBitrateArguments changeAudioBitrateArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ChangeAudioBitrateAsync(changeAudioBitrateArguments);
+})
+.WithName("ChangeAudioBitrate")
+.WithOpenApi();
+
+app.MapPost("/extractaudio", async (InputFileArguments inputFileArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ExtractAudioAsync(inputFileArguments);
+})
+.WithName("ExtractAudio")
+.WithOpenApi();
+
+app.MapPost("/weboptimizevideo", async (InputFileArguments inputFileArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.WebOptimizeVideoAsync(inputFileArguments);
+})
+.WithName("WebOptimizeVideo")
+.WithOpenApi();
+
+app.MapPost("/changevideospeed", async (ChangeVideoSpeedArguments changeVideoSpeedArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ChangeVideoSpeedAsync(changeVideoSpeedArguments);
+})
+.WithName("ChangeVideoSpeed")
+.WithOpenApi();
+
+app.MapPost("/changeaudiovolume", async (ChangeAudioVolumeArguments changeAudioVolumeArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ChangeAudioVolumeAsync(changeAudioVolumeArguments);
+})
+.WithName("ChangeAudioVolume")
+.WithOpenApi();
+
+app.MapPost("/extractsingleframe", async (ExtractSingleFrameArguments extractSingleFrameArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.ExtractSingleFrameAsync(extractSingleFrameArguments);
+})
+.WithName("ExtractSingleFrame")
 .WithOpenApi();
 
 app.MapPost("/precalculatevideosize", (SizeCalculationVariables variables) =>

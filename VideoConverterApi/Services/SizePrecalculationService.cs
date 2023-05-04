@@ -21,17 +21,17 @@ public class SizePrecalculationService
             return new PrecalculatedSize();
         }
 
-        var fileSizeInBytes = (videoBitrate + audioBitrate) * sizeCalculationVariables.Duration * CalculateOverheadFactor(sizeCalculationVariables.OverheadFactor);
+        var fileSizeInBits = (videoBitrate + audioBitrate) * sizeCalculationVariables.Duration * CalculateOverheadFactor(sizeCalculationVariables.OverheadFactor);
         return new PrecalculatedSize
         {
-            SizeInBytes = (int)fileSizeInBytes,
-            SizeInMegaBytes = ToMegabytes(fileSizeInBytes)
+            SizeInBits = (int)fileSizeInBits,
+            SizeInMegaBytes = ToMegabytes(fileSizeInBits)
         };
     }
 
-    private static int ToMegabytes(double sizeInBytes)
+    private static double ToMegabytes(double sizeInBits)
     {
-        return (int)sizeInBytes / 1024 / 1024;
+        return Math.Round(sizeInBits / 1024 / 1024 / 8, 2);
     }
 
     private static double CalculateOverheadFactor(OverheadFactor overheadFactor)

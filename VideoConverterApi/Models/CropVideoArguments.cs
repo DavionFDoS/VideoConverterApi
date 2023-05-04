@@ -1,8 +1,7 @@
 ﻿namespace VideoConverterApi.Models;
 
-public class CropVideoArguments
+public class CropVideoArguments : InputFileArguments
 {
-    public string? InputFileName { get; set; }
     public int Height { get; set;}
     public int Width { get; set; }
     public int X { get; set; }
