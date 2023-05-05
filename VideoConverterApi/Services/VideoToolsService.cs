@@ -1,6 +1,8 @@
 ﻿using CliWrap;
 using CliWrap.Buffered;
 using Serilog;
+using System.Text;
+using VideoConverterApi.Extensions;
 using VideoConverterApi.Interfaces;
 using VideoConverterApi.Models;
 
@@ -251,7 +253,7 @@ public class VideoToolsService : IVideoToolsService
         var videoBitrate = changeVideoBitrateArguments.VideoBitrate;
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -b:v {videoBitrate} {_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -c:v copy -b:v {videoBitrate} {_videosFolderName}{guid}.{extension}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -280,7 +282,7 @@ public class VideoToolsService : IVideoToolsService
         var audioBitrate = changeAudioBitrateArguments.AudioBitrate;
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -b:a {audioBitrate} {_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -c:a copy -b:a {audioBitrate} {_videosFolderName}{guid}.{extension}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -351,19 +353,110 @@ public class VideoToolsService : IVideoToolsService
         _logger.Information("Web optimize video command executed succesfully");
     }
 
-    public async Task AddWatermarkAsync()
+    public async Task AddWatermarkAsync(AddWatermarkArguments addWaterMarkArguments)
     {
+        if (addWaterMarkArguments is null)
+        {
+            return;
+        }
 
+        var inputFileName = addWaterMarkArguments.InputFileName;
+        var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var watermarkFileName = addWaterMarkArguments.WatermarkFileName;
+        var watermarkFilePath = $"{_videosFolderName}{watermarkFileName}";
+        var x = addWaterMarkArguments.X;
+        var y = addWaterMarkArguments.Y;
+        var guid = Guid.NewGuid();
+        var arguments = $"-i {inputFilePath} -i {watermarkFilePath} -filter_complex overlay={x}:{y} {_videosFolderName}{guid}.{extension}";
+        _logger.Information(arguments);
+
+        var cmd = WrapCommand(arguments);
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing add watermark command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Add watermark command executed succesfully");
     }
 
-    public async Task AddAudioAsync()
+    public async Task AddAudioAsync(AddAudioArguments addAudioArguments)
     {
+        if (addAudioArguments is null)
+        {
+            return;
+        }
 
+        var inputFileName = addAudioArguments.InputFileName;
+        var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var audioFileName = addAudioArguments.AudioFileName;
+        var audioFilePath = $"{_videosFolderName}{audioFileName}";
+        var guid = Guid.NewGuid();
+        var arguments = $"-i {inputFilePath} -i {audioFilePath} -c copy -shortest {_videosFolderName}{guid}.{extension}";
+        _logger.Information(arguments);
+
+        var cmd = WrapCommand(arguments);
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing add audio command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Add audio command executed succesfully");
     }
 
-    public async Task AddSubtitlesAsync()
+    public async Task AddSubtitlesAsync(AddSubtitlesArguments addSubtitlesArguments)
     {
+        if (addSubtitlesArguments is null)
+        {
+            return;
+        }
 
+        var inputFileName = addSubtitlesArguments.InputFileName;
+        var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var subtitlesFileName = addSubtitlesArguments.SubtitlesFileName;
+        var subtitlesFilePath = $"{_videosFolderName}{subtitlesFileName}";
+        var subtitlesExtension = subtitlesFileName?[(subtitlesFileName.IndexOf('.') + 1)..];
+        var guid = Guid.NewGuid();
+        string? arguments = null;
+
+        if (subtitlesExtension == "srt")
+        {
+            arguments = $"-i {inputFilePath} -vf subtitles={subtitlesFilePath} -c:s mov_text  {_videosFolderName}{guid}.{extension}";
+            _logger.Information(arguments);
+        }
+        
+        if(subtitlesExtension == "ass")
+        {
+            arguments = $"-i {inputFilePath} -vf ass={subtitlesFilePath} -c:s mov_text  {_videosFolderName}{guid}.{extension}";
+            _logger.Information(arguments);
+        }
+
+        if(arguments is null)
+        {
+            return;
+        }
+
+        var cmd = WrapCommand(arguments);
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing add subtitles command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Add subtitles command executed succesfully");
     }
 
     public async Task ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoBitrateArguments)
@@ -415,16 +508,39 @@ public class VideoToolsService : IVideoToolsService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing change video speed command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            _logger.Error("Error executing change audio volume command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
 
-        _logger.Information("Change video speed command executed succesfully");
+        _logger.Information("Change audio volume command executed succesfully");
     }
 
-    public async Task ChangeVideoResolutionAsync()
+    public async Task ChangeVideoResolutionAsync(ChangeVideoResolutionArguments changeVideoResolutionArguments)
     {
+        if (changeVideoResolutionArguments is null)
+        {
+            return;
+        }
 
+        var inputFileName = changeVideoResolutionArguments.InputFileName;
+        var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var resolution = changeVideoResolutionArguments.Resolution.GetEnumMemberValue();
+        var guid = Guid.NewGuid();
+        var arguments = $"-i {inputFilePath} -vf scale={resolution} -c:a copy {_videosFolderName}{guid}.{extension}";
+        _logger.Information(arguments);
+
+        var cmd = WrapCommand(arguments);
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing change audio volume command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Change audio volume command executed succesfully");
     }
 
     public async Task ExtractSingleFrameAsync(ExtractSingleFrameArguments extractSingleFrameArguments)
@@ -465,8 +581,50 @@ public class VideoToolsService : IVideoToolsService
         _logger.Information("Extract single frame command executed succesfully");
     }
 
-    public async Task MergeVideosAsync()
+    public async Task MergeVideosAsync(MergeVideosArguments mergeVideosArguments)
     {
+        if (mergeVideosArguments is null)
+        {
+            return;
+        }
 
+        var inputFileName = mergeVideosArguments.InputFileName;
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
+        var videosToMerge = mergeVideosArguments.VideosToMerge;
+        var videosToMergeArgument = GetVideosToMerge(videosToMerge);
+
+        var guid = Guid.NewGuid();
+        var arguments = $"-i {inputFilePath} {videosToMergeArgument}{_videosFolderName}{guid}.{extension}";
+        _logger.Information(arguments);
+
+        var cmd = WrapCommand(arguments);
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
+        {
+            _logger.Error("Error executing merge videos command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
+
+        _logger.Information("Merge videos command executed succesfully");
+    }
+
+    private static string GetVideosToMerge(IList<string> videosToMerge)
+    {
+        if (videosToMerge is null || videosToMerge.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var sb = new StringBuilder();
+
+        foreach (var videoToMerge in videosToMerge)
+        {
+            sb.Append($"-i {videoToMerge} ");
+        }
+
+        return sb.ToString();
     }
 }

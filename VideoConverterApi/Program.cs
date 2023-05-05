@@ -209,6 +209,30 @@ app.MapPost("/weboptimizevideo", async (InputFileArguments inputFileArguments) =
 .WithName("WebOptimizeVideo")
 .WithOpenApi();
 
+app.MapPost("/addwatermark", async (AddWatermarkArguments addWatermarkArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.AddWatermarkAsync(addWatermarkArguments);
+})
+.WithName("AddWatermark")
+.WithOpenApi();
+
+app.MapPost("/addaudio", async (AddAudioArguments addAudioArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.AddAudioAsync(addAudioArguments);
+})
+.WithName("AddAudio")
+.WithOpenApi();
+
+app.MapPost("/addsubtitles", async (AddSubtitlesArguments addSubtitlesArguments) =>
+{
+    var videoToolsService = new VideoToolsService();
+    await videoToolsService.AddSubtitlesAsync(addSubtitlesArguments);
+})
+.WithName("AddSubtitles")
+.WithOpenApi();
+
 app.MapPost("/changevideospeed", async (ChangeVideoSpeedArguments changeVideoSpeedArguments) =>
 {
     var videoToolsService = new VideoToolsService();
