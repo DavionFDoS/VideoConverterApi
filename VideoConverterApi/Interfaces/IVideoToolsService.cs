@@ -10,6 +10,7 @@ public interface IVideoToolsService
     Task ChangeAudioBitrateAsync(ChangeAudioBitrateArguments changeAudioBitrateArguments);
     Task ChangeAudioVolumeAsync(ChangeAudioVolumeArguments changeAudioVolumeArguments);
     Task ChangeVideoBitrateAsync(ChangeVideoBitrateArguments changeVideoBitrateArguments);
+    Task ChangeVideoFramerateAsync(ChangeVideoFramerateArguments changeVideoFramerateArguments);
     Task ChangeVideoResolutionAsync(ChangeVideoResolutionArguments changeVideoResolutionArguments);
     Task ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoSpeedArguments);
     Task CropVideoAsync(CropVideoArguments cropVideoArguments);
