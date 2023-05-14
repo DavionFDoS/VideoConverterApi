@@ -1,10 +1,11 @@
 ﻿using Serilog.Sinks.File;
 using VideoConverterApi.Enums;
+using VideoConverterApi.Interfaces;
 using VideoConverterApi.Models;
 
 namespace VideoConverterApi.Services;
 
-public class SizePrecalculationService
+public class SizePrecalculationService : ISizePrecalculationService
 {
     public PrecalculatedSize CalculateSize(SizeCalculationVariables sizeCalculationVariables)
     {
@@ -48,6 +49,7 @@ public class SizePrecalculationService
             OverheadFactor.ProRes => 1.1,
             OverheadFactor.DNxHD => 1.2,
             OverheadFactor.FFV1 => 1.0,
+            OverheadFactor.MJPEG => 1.2,
             _ => 1.25
         };
     }

@@ -260,7 +260,7 @@ public class VideoToolsService : IVideoToolsService
         var videoBitrate = changeVideoBitrateArguments.VideoBitrate;
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -b:v {videoBitrate}k {videoBitrate}k {_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -b:v {videoBitrate} {videoBitrate} {_videosFolderName}{guid}.{extension}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -289,7 +289,7 @@ public class VideoToolsService : IVideoToolsService
         var audioBitrate = changeAudioBitrateArguments.AudioBitrate;
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -b:a {audioBitrate}k {_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -b:a {audioBitrate} {_videosFolderName}{guid}.{extension}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);

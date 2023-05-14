@@ -10,5 +10,6 @@ public enum OverheadFactor
     DV,
     ProRes, // range: 1.0-1.2
     DNxHD, // range: 1.1-1.3
-    FFV1
+    FFV1,
+    MJPEG
 }

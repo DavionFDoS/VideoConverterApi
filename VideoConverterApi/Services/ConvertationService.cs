@@ -7,18 +7,17 @@ using Microsoft.OpenApi.Extensions;
 using VideoConverterApi.Enums;
 using VideoConverterApi.Extensions;
 using System;
+using VideoConverterApi.Modelsж;
 
 namespace VideoConverterApi.Services;
 
 public class ConvertationService : IConvertationService
 {
-    private readonly CommandArguments _commandArguments;
     private readonly Serilog.ILogger _logger;
     private readonly string _videosFolderName = "Videos/";
     private readonly MediaMetadataService _mediaMetadataService = new();
-    public ConvertationService(CommandArguments commandArguments)
+    public ConvertationService()
     {
-        _commandArguments = commandArguments;
         _logger = new LoggerConfiguration()
             .WriteTo.File("ConvertionServiceLogs.txt")
             .CreateLogger();
@@ -32,9 +31,14 @@ public class ConvertationService : IConvertationService
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
     }
-    public async Task ConvertToMP4WithNoArguments()
+    public async Task ConvertToMP4WithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
@@ -56,18 +60,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MP4 with no arguments command executed succesfully");
     }
-    public async Task ConvertToAVIWithNoArguments()
+    public async Task ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
-        var metadata = _mediaMetadataService.GetMediaMetadata(inputFilePath);
-        _logger.Information(metadata.ToString());
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.avi");
@@ -79,21 +86,23 @@ public class ConvertationService : IConvertationService
             _logger.Error("Error executing convert to AVI with no arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
-        metadata = _mediaMetadataService.GetMediaMetadata($"{ _videosFolderName}{guid}.avi");
-        _logger.Information(metadata.ToString());
         _logger.Information("Convert to AVI with no arguments command executed succesfully");
     }
-    public async Task ConvertToWebMWithNoArguments()
+    public async Task ConvertToWebMWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
 
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.webm");
@@ -108,16 +117,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to WebM with no arguments command executed succesfully");
     }
-    public async Task ConvertToMOVWithNoArguments()
+    public async Task ConvertToMOVWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mov");
@@ -132,16 +146,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MOV with no arguments command executed succesfully");
     }
-    public async Task ConvertToMKVWithNoArguments()
+    public async Task ConvertToMKVWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mkv");
@@ -156,16 +175,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MKV with no arguments command executed succesfully");
     }
-    public async Task ConvertToFLVWithNoArguments()
+    public async Task ConvertToFLVWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.flv");
@@ -180,16 +204,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to FLV with no arguments command executed succesfully");
     }
-    public async Task ConvertTo3GPWithNoArguments()
+    public async Task ConvertTo3GPWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} -c:v libx264 -b:v 512k -c:a aac -b:a 128k -ar 8000 -ac 1 {_videosFolderName}{guid}.3gp");      
@@ -204,16 +233,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to 3GP with no arguments command executed succesfully");
     }
-    public async Task ConvertToMPEGWithNoArguments()
+    public async Task ConvertToMPEGWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.mpeg");
@@ -228,16 +262,21 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MPEG with no arguments command executed succesfully");
     }
-    public async Task ConvertToWMVWithNoArguments()
+    public async Task ConvertToWMVWithNoArguments(InputFileArguments inputFileArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (inputFileArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
         var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.wmv");
@@ -252,19 +291,25 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to VMV with no arguments command executed succesfully");
     }
-    public async Task ConvertToGIFWithNoArguments()
+    public async Task ConvertToGIFWithArguments(ConvertToGIFArguments convertToGIFArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
-
-        if (inputFileName is null)
+        if (convertToGIFArguments is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFileName = convertToGIFArguments.InputFileName;
+        var framerate = convertToGIFArguments.Framerate;
+
+        if (inputFileName is null || framerate < 0)
+        {
+            return;
+        }
+
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = WrapCommand($"-i {inputFilePath} -vf scale=320:-1 -r 10 -f gif {_videosFolderName}{guid}.gif");
+        var cmd = WrapCommand($"-i {inputFilePath} -vf scale=320:-1 -r {framerate} -f gif {_videosFolderName}{guid}.gif");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -276,18 +321,25 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to GIF with no arguments command executed succesfully");
     }
-    public async Task ConvertToSeriesOfImages()
+    public async Task ConvertToSeriesOfImages(ConvertToSeriesOfImagesArguments convertToSeriesOfImagesArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
-
-        if (inputFileName is null)
+        if (convertToSeriesOfImagesArguments is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
+        var inputFileName = convertToSeriesOfImagesArguments.InputFileName;
+        var numberOfImages = convertToSeriesOfImagesArguments.NumberOfImages;
+        var perNumberOfSeconds = convertToSeriesOfImagesArguments.PerNumberOfSeconds;
 
-        var cmd = WrapCommand($"-i {inputFilePath} -r 1/5 {_videosFolderName}image_%03d.jpg");
+        if (inputFileName is null || numberOfImages == 0 || perNumberOfSeconds == 0)
+        {
+            return;
+        }
+
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+
+        var cmd = WrapCommand($"-i {inputFilePath} -vf fps={numberOfImages}/{perNumberOfSeconds} {_videosFolderName}image_%03d.png");
         
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -299,22 +351,27 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to series of images command executed succesfully");
     }
-    public async Task ConvertToMP4WithArguments()
+    public async Task ConvertToMP4WithArguments(ConvertToMP4Arguments convertToMP4Arguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (convertToMP4Arguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = convertToMP4Arguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
-        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "libx264";
-        var videoBitrate = _commandArguments.VideoBitrate ?? "10000k";
-        var preset = _commandArguments.Preset.GetEnumMemberValue() ?? "medium";
-        var crf = _commandArguments.Crf ?? "23";
-        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "aac";
-        var audioBitrate = _commandArguments.AudioBitrate ?? "128k";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var videoCodec = convertToMP4Arguments.MP4CompatibleVideoCodecs.GetEnumMemberValue() ?? "libx264";
+        var videoBitrate = convertToMP4Arguments.VideoBitrate ?? 10000000;
+        var preset = convertToMP4Arguments.Preset.GetEnumMemberValue() ?? "medium";
+        var crf = convertToMP4Arguments.Crf ?? 23;
+        var audioCodec = convertToMP4Arguments.MP4CompatibleAudioCodecs.GetEnumMemberValue() ?? "aac";
+        var audioBitrate = convertToMP4Arguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
         var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mp4";
         var cts = new CancellationTokenSource();
@@ -339,21 +396,26 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MP4 with arguments command executed succesfully");
     }
-    public async Task ConvertToAVIWithArguments()
+    public async Task ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (convertToAVIArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = convertToAVIArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
-        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "mpeg4";
-        var videoBitrate = _commandArguments.VideoBitrate ?? "500k";
-        var preset = _commandArguments.Preset.GetEnumMemberValue() ?? "medium";
-        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "libmp3lame";
-        var audioBitrate = _commandArguments.AudioBitrate ?? "128k";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var videoCodec = convertToAVIArguments.AVICompatibleVideoCodecs.GetEnumMemberValue() ?? "mpeg4";
+        var videoBitrate = convertToAVIArguments.VideoBitrate ?? 500000;
+        var preset = convertToAVIArguments.Preset.GetEnumMemberValue() ?? "medium";
+        var audioCodec = convertToAVIArguments.AVICompatibleAudioCodecs.GetEnumMemberValue() ?? "libmp3lame";
+        var audioBitrate = convertToAVIArguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
         var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -q:v 10 -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.avi";
         var cts = new CancellationTokenSource();
@@ -379,22 +441,27 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to AVI with arguments command executed succesfully");
     }
-    public async Task ConvertToWebMWithArguments()
+    public async Task ConvertToWebMWithArguments(ConvertToWebmArguments convertToWebmArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (convertToWebmArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = convertToWebmArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
-        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "libvpx-vp9";
-        var videoBitrate = _commandArguments.VideoBitrate ?? "0";
-        var preset = _commandArguments.Preset.GetEnumMemberValue() ?? "medium";
-        var crf = _commandArguments.Crf ?? "30";
-        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "libopus";
-        var audioBitrate = _commandArguments.AudioBitrate ?? "128k";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var videoCodec = convertToWebmArguments.WebmCompatibleVideoCodecs.GetEnumMemberValue() ?? "libvpx-vp9";
+        var videoBitrate = convertToWebmArguments.VideoBitrate ?? 0;
+        var preset = convertToWebmArguments.Preset.GetEnumMemberValue() ?? "medium";
+        var crf = convertToWebmArguments.Crf ?? 30;
+        var audioCodec = convertToWebmArguments.WebmCompatibleAudioCodecs.GetEnumMemberValue() ?? "libopus";
+        var audioBitrate = convertToWebmArguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
         var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.webm";
         var cts = new CancellationTokenSource();
@@ -420,20 +487,25 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to WebM with arguments command executed succesfully");
     }
-    public async Task ConvertToMOVWithArguments()
+    public async Task ConvertToMOVWithArguments(ConvertToMOVArguments convertToMOVArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (convertToMOVArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = convertToMOVArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
-        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "prores_ks";
-        var videoBitrate = _commandArguments.VideoBitrate ?? "12000k";
-        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "pcm_s24le";
-        var audioBitrate = _commandArguments.AudioBitrate ?? "320k";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var videoCodec = convertToMOVArguments.MOVCompatibleVideoCodecs.GetEnumMemberValue() ?? "prores_ks";
+        var videoBitrate = convertToMOVArguments.VideoBitrate ?? 12000000;
+        var audioCodec = convertToMOVArguments.MOVCompatibleAudioCodecs.GetEnumMemberValue() ?? "pcm_s24le";
+        var audioBitrate = convertToMOVArguments.AudioBitrate ?? 320000;
         var guid = Guid.NewGuid();
         var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -profile:v 3 -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mov";
         var cts = new CancellationTokenSource();
@@ -459,24 +531,29 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MOV with arguments command executed succesfully");
     }
-    public async Task ConvertToMKVWithArguments()
+    public async Task ConvertToMKVWithArguments(ConvertToMKVArguments convertToMKVArguments)
     {
-        var inputFileName = _commandArguments.InputFileName;
+        if (convertToMKVArguments is null)
+        {
+            return;
+        }
+
+        var inputFileName = convertToMKVArguments.InputFileName;
 
         if (inputFileName is null)
         {
             return;
         }
 
-        var inputFilePath = $"Videos/{inputFileName}";
-        var videoCodec = _commandArguments.VideoCodec.GetEnumMemberValue() ?? "libx264"; //to change
-        var videoBitrate = _commandArguments.VideoBitrate ?? "12000k";
-        var preset = _commandArguments.Preset.GetEnumMemberValue() ?? "slow";
-        var crf = _commandArguments.Crf ?? "22";
-        var audioCodec = _commandArguments.AudioCodec.GetEnumMemberValue() ?? "aac";
-        var audioBitrate = _commandArguments.AudioBitrate ?? "192k";
+        var inputFilePath = $"{_videosFolderName}{inputFileName}";
+        var videoCodec = convertToMKVArguments.MKVCompatibleVideoCodecs.GetEnumMemberValue() ?? "libx264";
+        var videoBitrate = convertToMKVArguments.VideoBitrate ?? 12000000;
+        var preset = convertToMKVArguments.Preset.GetEnumMemberValue() ?? "slow";
+        var crf = convertToMKVArguments.Crf ?? 22;
+        var audioCodec = convertToMKVArguments.MKVCompatibleAudioCodecs.GetEnumMemberValue() ?? "aac";
+        var audioBitrate = convertToMKVArguments.AudioBitrate ?? 192000;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf}  -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mkv";
+        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mkv";
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
