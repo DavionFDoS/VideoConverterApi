@@ -389,8 +389,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to MP4 with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
-            _logger.Error("Command arguments was {arguments}", arguments);
+            _logger.Error("Error executing convert to MP4 with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -434,8 +433,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to AVI with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
-            _logger.Error("Command arguments was {arguments}", arguments);
+            _logger.Error("Error executing convert to AVI with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -457,13 +455,12 @@ public class ConvertationService : IConvertationService
 
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var videoCodec = convertToWebmArguments.WebmCompatibleVideoCodecs.GetEnumMemberValue() ?? "libvpx-vp9";
-        var videoBitrate = convertToWebmArguments.VideoBitrate ?? 0;
+        var videoBitrate = convertToWebmArguments.VideoBitrate ?? 1000000;
         var preset = convertToWebmArguments.Preset.GetEnumMemberValue() ?? "medium";
-        var crf = convertToWebmArguments.Crf ?? 30;
         var audioCodec = convertToWebmArguments.WebmCompatibleAudioCodecs.GetEnumMemberValue() ?? "libopus";
         var audioBitrate = convertToWebmArguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -crf {crf} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.webm";
+        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.webm";
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
@@ -480,8 +477,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to WebM with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
-            _logger.Error("Command arguments was {arguments}", arguments);
+            _logger.Error("Error executing convert to WebM with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -524,8 +520,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to MOV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
-            _logger.Error("Command arguments was {arguments}", arguments);
+            _logger.Error("Error executing convert to MOV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -571,7 +566,6 @@ public class ConvertationService : IConvertationService
         if (cmdResult.ExitCode != 0)
         {
             _logger.Error("Error executing convert to MKV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
-            _logger.Error("Command arguments was {arguments}", arguments);
             throw new Exception("Error executing ffmpeg command");
         }
 
