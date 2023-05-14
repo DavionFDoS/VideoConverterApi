@@ -503,7 +503,7 @@ public class ConvertationService : IConvertationService
         var audioCodec = convertToMOVArguments.MOVCompatibleAudioCodecs.GetEnumMemberValue() ?? "pcm_s24le";
         var audioBitrate = convertToMOVArguments.AudioBitrate ?? 320000;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -profile:v 3 -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mov";
+        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.mov";
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
