@@ -7,7 +7,6 @@ using Microsoft.OpenApi.Extensions;
 using VideoConverterApi.Enums;
 using VideoConverterApi.Extensions;
 using System;
-using VideoConverterApi.Modelsж;
 
 namespace VideoConverterApi.Services;
 
@@ -15,7 +14,6 @@ public class ConvertationService : IConvertationService
 {
     private readonly Serilog.ILogger _logger;
     private readonly string _videosFolderName = "Videos/";
-    private readonly MediaMetadataService _mediaMetadataService = new();
     public ConvertationService()
     {
         _logger = new LoggerConfiguration()

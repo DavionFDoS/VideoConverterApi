@@ -1,7 +1,6 @@
 using VideoConverterApi.Services;
 using VideoConverterApi.Interfaces;
 using VideoConverterApi.Models;
-using VideoConverterApi.Modelsæ;
 
 var builder = WebApplication.CreateBuilder(args);
 

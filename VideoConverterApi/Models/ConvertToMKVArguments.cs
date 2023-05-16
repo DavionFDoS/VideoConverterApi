@@ -1,7 +1,7 @@
 ﻿using VideoConverterApi.Models;
 using VideoConverterApi.Enums;
 
-namespace VideoConverterApi.Modelsж
+namespace VideoConverterApi.Models
 {
     public class ConvertToMKVArguments : ConvertationBaseArguments
     {
