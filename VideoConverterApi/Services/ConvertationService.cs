@@ -367,7 +367,7 @@ public class ConvertationService : IConvertationService
         var videoCodec = convertToMP4Arguments.MP4CompatibleVideoCodecs.GetEnumMemberValue() ?? "libx264";
         var videoBitrate = convertToMP4Arguments.VideoBitrate ?? 10000000;
         var preset = convertToMP4Arguments.Preset.GetEnumMemberValue() ?? "medium";
-        var crf = convertToMP4Arguments.Crf ?? 23;
+        var crf = convertToMP4Arguments.Crf;
         var audioCodec = convertToMP4Arguments.MP4CompatibleAudioCodecs.GetEnumMemberValue() ?? "aac";
         var audioBitrate = convertToMP4Arguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
@@ -411,10 +411,11 @@ public class ConvertationService : IConvertationService
         var videoCodec = convertToAVIArguments.AVICompatibleVideoCodecs.GetEnumMemberValue() ?? "mpeg4";
         var videoBitrate = convertToAVIArguments.VideoBitrate ?? 500000;
         var preset = convertToAVIArguments.Preset.GetEnumMemberValue() ?? "medium";
+        var qv = convertToAVIArguments.Qv;
         var audioCodec = convertToAVIArguments.AVICompatibleAudioCodecs.GetEnumMemberValue() ?? "libmp3lame";
         var audioBitrate = convertToAVIArguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -q:v 10 -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.avi";
+        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -q:v {qv} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.avi";
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
@@ -542,7 +543,7 @@ public class ConvertationService : IConvertationService
         var videoCodec = convertToMKVArguments.MKVCompatibleVideoCodecs.GetEnumMemberValue() ?? "libx264";
         var videoBitrate = convertToMKVArguments.VideoBitrate ?? 12000000;
         var preset = convertToMKVArguments.Preset.GetEnumMemberValue() ?? "slow";
-        var crf = convertToMKVArguments.Crf ?? 22;
+        var crf = convertToMKVArguments.Crf;
         var audioCodec = convertToMKVArguments.MKVCompatibleAudioCodecs.GetEnumMemberValue() ?? "aac";
         var audioBitrate = convertToMKVArguments.AudioBitrate ?? 192000;
         var guid = Guid.NewGuid();

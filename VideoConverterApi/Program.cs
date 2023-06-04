@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
 builder.Services.AddScoped<IVideoToolsService, VideoToolsService>();
 builder.Services.AddScoped<IConvertationService, ConvertationService>();
 builder.Services.AddScoped<ISizePrecalculationService, SizePrecalculationService>();
@@ -17,6 +18,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(policy =>
+{
+    policy.AllowAnyOrigin();
+    policy.AllowAnyMethod();
+    policy.AllowAnyHeader();
+});
 
 app.UseHttpsRedirection();
 
