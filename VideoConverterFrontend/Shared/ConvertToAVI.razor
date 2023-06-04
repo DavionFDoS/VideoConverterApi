@@ -1,0 +1,171 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+
+<h3>ConvertToAVI</h3>
+
+<SingleVideoUploader />
+
+<h4>Advanced Settings</h4>
+
+<button @onclick="ToggleAdvancedSettings">Откртыть расширенные настройки</button>
+
+@if (showAdvancedSettings)
+{
+    <h5>Video Codec</h5>
+    <select @bind="selectedVideoCodec">
+        @foreach (var codec in Enum.GetValues(typeof(AVICompatibleVideoCodecs)))
+        {
+            <option value="@codec">@codec</option>
+        }
+    </select>
+
+    <h5>Audio Codec</h5>
+    <select @bind="selectedAudioCodec">
+        @foreach (var codec in Enum.GetValues(typeof(AVICompatibleAudioCodecs)))
+        {
+            <option value="@codec">@codec</option>
+        }
+    </select>
+
+    <h5>Video Bitrate</h5>
+    <input type="number" @bind="videoBitrate" />
+    <label>bits/s</label>
+
+    <h5>Audio Bitrate</h5>
+    <input type="number" @bind="audioBitrate" />
+    <label>bits/s</label>
+
+    <h5>Quality Value (0 - 10 range)</h5>
+    <input type="number" @bind="qv" />
+
+    <h5>Preset</h5>
+    <select @bind="selectedPreset">
+        @foreach (var preset in Enum.GetValues(typeof(Presets)))
+        {
+            <option value="@preset">@preset</option>
+        }
+    </select>
+}
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="ConvertVideo" disabled="@isConverting">
+        @if (isConverting)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Convert</span>
+        }
+    </button>
+</div>
+
+@if (isConverting)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Converting video, please wait...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool showAdvancedSettings;
+    private bool isConverting = false;
+    private AVICompatibleVideoCodecs selectedVideoCodec;
+    private AVICompatibleAudioCodecs selectedAudioCodec;
+    private int videoBitrate;
+    private int audioBitrate;
+    private int qv;
+    private Presets selectedPreset;
+    private string _apiBaseURL = "https://localhost:44337/";
+    private List<string> _errors = new();
+
+    private void ToggleAdvancedSettings()
+    {
+        showAdvancedSettings = !showAdvancedSettings;
+    }
+
+    private async Task ConvertVideo()
+    {
+        isConverting = true;
+
+        if (showAdvancedSettings)
+        {
+            var arguments = new ConvertToAVIArguments
+                {
+                    InputFileName = InputFileName,
+                    AVICompatibleVideoCodecs = selectedVideoCodec,
+                    AVICompatibleAudioCodecs = selectedAudioCodec,
+                    VideoBitrate = videoBitrate,
+                    AudioBitrate = audioBitrate,
+                    Preset = selectedPreset,
+                    Qv = qv
+                };
+
+            _errors.Add(arguments.InputFileName!);
+
+            var response = await client.PostAsJsonAsync($"{_apiBaseURL}/converttoaviwitharguments", arguments);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Get the download URL or file path from the response
+                string downloadUrl = await response.Content.ReadAsStringAsync();
+
+                // Trigger the download in the browser
+                await JsRuntime.InvokeAsync<object>("open", downloadUrl, "_blank");
+            }
+            else
+            {
+                _errors.Add(response.StatusCode.ToString());
+            }
+
+            isConverting = false;
+        }
+        else
+        {
+            var arguments = new InputFileArguments
+                {
+                    InputFileName = InputFileName
+                };
+
+            _errors.Add(arguments.InputFileName!);
+
+            var response = await client.PostAsJsonAsync($"{_apiBaseURL}converttoaviwithnoarguments", arguments);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "");
+                string downloadUrl = $"{_apiBaseURL}/download?filePath={outputFileName}";
+                _errors.Add(downloadUrl);
+                // Trigger the download in the browser
+                await JsRuntime.InvokeAsync<object>("open", downloadUrl, "_blank");
+            }
+            else
+            {
+                _errors.Add(response.StatusCode.ToString());
+            }
+
+            isConverting = false;
+        }
+    }
+}

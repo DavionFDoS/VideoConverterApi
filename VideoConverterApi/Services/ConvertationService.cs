@@ -7,13 +7,14 @@ using Microsoft.OpenApi.Extensions;
 using VideoConverterApi.Enums;
 using VideoConverterApi.Extensions;
 using System;
+using System.Runtime.Intrinsics.X86;
 
 namespace VideoConverterApi.Services;
 
 public class ConvertationService : IConvertationService
 {
     private readonly Serilog.ILogger _logger;
-    private readonly string _videosFolderName = "Videos/";
+    private readonly string _videosFolderName = "Videos/Uploads/";
     public ConvertationService()
     {
         _logger = new LoggerConfiguration()
@@ -58,24 +59,26 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MP4 with no arguments command executed succesfully");
     }
-    public async Task ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments)
+    public async Task<OutputFileArguments> ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments)
     {
         if (inputFileArguments is null)
         {
-            return;
+            return null;
         }
 
         var inputFileName = inputFileArguments.InputFileName;
 
         if (inputFileName is null)
         {
-            return;
+            return null;
         }
 
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
 
-        var cmd = WrapCommand($"-i {inputFilePath} {_videosFolderName}{guid}.avi");
+        var outputFileName = $"{ _videosFolderName }{ guid}.avi";
+
+        var cmd = WrapCommand($"-i {inputFilePath} {outputFileName}");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -85,6 +88,13 @@ public class ConvertationService : IConvertationService
             throw new Exception("Error executing ffmpeg command");
         }
         _logger.Information("Convert to AVI with no arguments command executed succesfully");
+
+        var outputFileArguments = new OutputFileArguments()
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputFileArguments;
     }
     public async Task ConvertToWebMWithNoArguments(InputFileArguments inputFileArguments)
     {
@@ -393,18 +403,18 @@ public class ConvertationService : IConvertationService
 
         _logger.Information("Convert to MP4 with arguments command executed succesfully");
     }
-    public async Task ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments)
+    public async Task<OutputFileArguments?> ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments)
     {
         if (convertToAVIArguments is null)
         {
-            return;
+            return null;
         }
 
         var inputFileName = convertToAVIArguments.InputFileName;
 
         if (inputFileName is null)
         {
-            return;
+            return null;
         }
 
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
@@ -415,7 +425,9 @@ public class ConvertationService : IConvertationService
         var audioCodec = convertToAVIArguments.AVICompatibleAudioCodecs.GetEnumMemberValue() ?? "libmp3lame";
         var audioBitrate = convertToAVIArguments.AudioBitrate ?? 128000;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -q:v {qv} -c:a {audioCodec} -b:a {audioBitrate} {_videosFolderName}{guid}.avi";
+        var outputFileName = $"{_videosFolderName}{guid}.avi";
+
+        var arguments = $"-i {inputFilePath} -c:v {videoCodec} -b:v {videoBitrate} -preset {preset} -q:v {qv} -c:a {audioCodec} -b:a {audioBitrate} {outputFileName}";
         var cts = new CancellationTokenSource();
         var token = cts.Token;
         _logger.Information("Command arguments was {arguments}", arguments);
@@ -437,6 +449,13 @@ public class ConvertationService : IConvertationService
         }
 
         _logger.Information("Convert to AVI with arguments command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
     public async Task ConvertToWebMWithArguments(ConvertToWebmArguments convertToWebmArguments)
     {

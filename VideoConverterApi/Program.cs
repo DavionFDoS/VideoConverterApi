@@ -1,6 +1,10 @@
 using VideoConverterApi.Services;
 using VideoConverterApi.Interfaces;
 using VideoConverterApi.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +37,7 @@ app.MapPost("/converttomp4withnoarguments", async (InputFileArguments inputFileA
     .WithOpenApi()
     .WithTags("ConvertationService");
 
-app.MapPost("/converttoaviwithnoarguments", async (InputFileArguments inputFileArguments, IConvertationService convertationService) => { await convertationService.ConvertToAVIWithNoArguments(inputFileArguments); })
+app.MapPost("/converttoaviwithnoarguments", async Task<OutputFileArguments> (InputFileArguments inputFileArguments, IConvertationService convertationService) => { return await convertationService.ConvertToAVIWithNoArguments(inputFileArguments); })
     .WithName("ConvertToAVIWithNoArguments")
     .WithOpenApi()
     .WithTags("ConvertationService");
@@ -206,5 +210,26 @@ app.MapPost("/precalculatevideosize", (SizeCalculationVariables variables, ISize
 .WithName("PrecalculateVideoSize")
 .WithOpenApi()
 .WithTags("SizePrecalculationService");
+
+app.MapGet("/download", async (string filePath, HttpContext context) =>
+{
+    if (File.Exists(filePath))
+    {
+        var fileProvider = new PhysicalFileProvider(Path.GetDirectoryName(filePath));
+        var fileInfo = fileProvider.GetFileInfo(Path.GetFileName(filePath));
+
+        context.Response.ContentType = "application/octet-stream";
+        context.Response.Headers["Content-Disposition"] = $"attachment; filename={fileInfo.Name}";
+
+        await context.Response.SendFileAsync(fileInfo);
+    }
+    else
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+    }
+})
+.WithName("Download")
+.WithOpenApi()
+.WithTags("DownloadFileService");
 
 app.Run();

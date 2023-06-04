@@ -1,0 +1,71 @@
+﻿@page "/"
+@using System.Net.Http
+@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>VideoConverter</PageTitle>
+
+<h3>Video Converter</h3>
+
+<h4>Supported Formats</h4>
+<select @bind="selectedFormat">
+    @foreach (var format in Enum.GetValues(typeof(VideoFormat)))
+    {
+        <option value="@format">@format</option>
+    }
+</select>
+
+@if (selectedFormat != null)
+{
+    <DynamicComponent Type="GetConversionComponentType(selectedFormat)" Parameters="parameters"/>
+}
+
+@code {
+    private VideoFormat selectedFormat;
+    private string? inputFileName = SingleVideoUploader.FileName;
+    private Dictionary<VideoFormat, Type> conversionComponents;
+    private Dictionary<string, object> parameters = new Dictionary<string, object>()
+    {
+        { "InputFileName", SingleVideoUploader.FileName }
+    };
+
+    protected override void OnInitialized()
+    {
+        conversionComponents = new Dictionary<VideoFormat, Type>
+        {
+            { VideoFormat.AVI, typeof(ConvertToAVI) },
+            { VideoFormat.WebM, typeof(ConvertToWebM) },
+            { VideoFormat.MP4, typeof(ConvertToMP4) },
+            { VideoFormat.MPEG, typeof(ConvertToMPEG) },
+            { VideoFormat.MOV, typeof(ConvertToMOV) },
+            { VideoFormat.MKV, typeof(ConvertToMKV) },
+            { VideoFormat.FLV, typeof(ConvertToFLV) },
+            { VideoFormat.GP3, typeof(ConvertTo3GP) },
+            { VideoFormat.WMV, typeof(ConvertToWMV) },
+            { VideoFormat.GIF, typeof(ConvertToGIF) },
+            { VideoFormat.IMAGES, typeof(ConvertToIMAGES) },
+        };
+
+        base.OnInitialized();
+    }
+
+    private Type GetConversionComponentType(VideoFormat format)
+    {
+        return conversionComponents.ContainsKey(format) ? conversionComponents[format] : null;
+    }
+
+    private enum VideoFormat
+    {
+        MP4,
+        AVI,
+        WebM,
+        MOV,
+        MKV,
+        FLV,
+        MPEG,
+        WMV,
+        GP3,
+        GIF,
+        IMAGES,
+    }
+}

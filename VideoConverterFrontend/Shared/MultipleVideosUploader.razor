@@ -1,0 +1,51 @@
+﻿@inject IConfiguration config
+
+<div>
+    <InputFile multiple accept="video/*" OnChange="@OnChange" />
+</div>
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+    private readonly string _folderName = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos";
+    private const int _maxAllowedSize = 2000 * 1024 * 1024;
+    private List<string> _errors = new();
+
+    private async Task OnChange(InputFileChangeEventArgs e)
+    {
+        _errors.Clear();
+
+        foreach (var file in e.GetMultipleFiles())
+        {
+            try
+            {
+
+                var newFileName = Path.ChangeExtension(
+                Path.GetRandomFileName(),
+                Path.GetExtension(file.Name));
+
+                var path = Path.Combine(config.GetValue<string>("FileStorage")!, "Uploads", newFileName);
+
+                Directory.CreateDirectory(
+                Path.Combine(config.GetValue<string>("FileStorage")!, "Uploads"));
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(_maxAllowedSize).CopyToAsync(fs);
+            }
+            catch (Exception ex)
+            {
+                _errors.Add($"File {file.Name} Error: {ex.Message}");
+                throw;
+            }
+        }
+    }
+}

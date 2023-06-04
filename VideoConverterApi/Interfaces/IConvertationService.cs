@@ -5,8 +5,8 @@ namespace VideoConverterApi.Interfaces;
 public interface IConvertationService
 {
     Task ConvertTo3GPWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments);
-    Task ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments> ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments);
+    Task<OutputFileArguments> ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments);
     Task ConvertToFLVWithNoArguments(InputFileArguments inputFileArguments);
     Task ConvertToGIFWithArguments(ConvertToGIFArguments convertToGIFArguments);
     Task ConvertToMKVWithArguments(ConvertToMKVArguments convertToMKVArguments);

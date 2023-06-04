@@ -11,7 +11,7 @@ namespace VideoConverterApi.Services;
 public class VideoToolsService : IVideoToolsService
 {
     private readonly Serilog.ILogger _logger;
-    private readonly string _videosFolderName = "Videos/";
+    private readonly string _videosFolderName = "Videos/Uploads/";
     private readonly MediaMetadataService _mediaMetadataService = new();
 
     public VideoToolsService()
