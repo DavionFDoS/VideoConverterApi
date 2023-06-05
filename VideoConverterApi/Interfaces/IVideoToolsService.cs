@@ -4,23 +4,23 @@ namespace VideoConverterApi.Interfaces;
 
 public interface IVideoToolsService
 {
-    Task AddAudioAsync(AddAudioArguments addAudioArguments);
-    Task AddSubtitlesAsync(AddSubtitlesArguments addSubtitlesArguments);
-    Task AddWatermarkAsync(AddWatermarkArguments addWatermarkArguments);
-    Task ChangeAudioBitrateAsync(ChangeAudioBitrateArguments changeAudioBitrateArguments);
-    Task ChangeAudioVolumeAsync(ChangeAudioVolumeArguments changeAudioVolumeArguments);
-    Task ChangeVideoBitrateAsync(ChangeVideoBitrateArguments changeVideoBitrateArguments);
-    Task ChangeVideoFramerateAsync(ChangeVideoFramerateArguments changeVideoFramerateArguments);
-    Task ChangeVideoResolutionAsync(ChangeVideoResolutionArguments changeVideoResolutionArguments);
-    Task ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoSpeedArguments);
-    Task CropVideoAsync(CropVideoArguments cropVideoArguments);
-    Task CutVideoAsync(CutVideoArguments cutVideoArguments);
-    Task ExtractAudioAsync(InputFileArguments inputFileArguments);
-    Task ExtractSingleFrameAsync(ExtractSingleFrameArguments extractSingleFrameArguments);
-    Task MergeVideosAsync(MergeVideosArguments mergeVideosArguments);
-    Task ReflectVideoAsync(ReflectVideoArguments reflectVideoArguments);
-    Task RemoveAudioAsync(InputFileArguments inputFileArguments);
-    Task ReverseVideoAsync(InputFileArguments inputFileArguments);
-    Task RotateVideoByAngleAsync(RotateVideoArguments rotateVideoArguments);
-    Task WebOptimizeVideoAsync(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> AddAudioAsync(AddAudioArguments addAudioArguments);
+    Task<OutputFileArguments?> AddSubtitlesAsync(AddSubtitlesArguments addSubtitlesArguments);
+    Task<OutputFileArguments?> AddWatermarkAsync(AddWatermarkArguments addWatermarkArguments);
+    Task<OutputFileArguments?> ChangeAudioBitrateAsync(ChangeAudioBitrateArguments changeAudioBitrateArguments);
+    Task<OutputFileArguments?> ChangeAudioVolumeAsync(ChangeAudioVolumeArguments changeAudioVolumeArguments);
+    Task<OutputFileArguments?> ChangeVideoBitrateAsync(ChangeVideoBitrateArguments changeVideoBitrateArguments);
+    Task<OutputFileArguments?> ChangeVideoFramerateAsync(ChangeVideoFramerateArguments changeVideoFramerateArguments);
+    Task<OutputFileArguments?> ChangeVideoResolutionAsync(ChangeVideoResolutionArguments changeVideoResolutionArguments);
+    Task<OutputFileArguments?> ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoSpeedArguments);
+    Task<OutputFileArguments?> CropVideoAsync(CropVideoArguments cropVideoArguments);
+    Task<OutputFileArguments?> CutVideoAsync(CutVideoArguments cutVideoArguments);
+    Task<OutputFileArguments?> ExtractAudioAsync(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ExtractSingleFrameAsync(ExtractSingleFrameArguments extractSingleFrameArguments);
+    Task<OutputFileArguments?> MergeVideosAsync(MergeVideosArguments mergeVideosArguments);
+    Task<OutputFileArguments?> ReflectVideoAsync(ReflectVideoArguments reflectVideoArguments);
+    Task<OutputFileArguments?> RemoveAudioAsync(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ReverseVideoAsync(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> RotateVideoByAngleAsync(RotateVideoArguments rotateVideoArguments);
+    Task<OutputFileArguments?> WebOptimizeVideoAsync(InputFileArguments inputFileArguments);
 }

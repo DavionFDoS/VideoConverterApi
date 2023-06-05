@@ -28,19 +28,20 @@ public class VideoToolsService : IVideoToolsService
             .WithStandardErrorPipe(PipeTarget.ToDelegate(_logger.Error))
             .WithStandardOutputPipe(PipeTarget.ToDelegate(_logger.Information));
     }
-    public async Task ReverseVideoAsync(InputFileArguments inputFileArguments)
+    public async Task<OutputFileArguments?> ReverseVideoAsync(InputFileArguments inputFileArguments)
     {
         if (inputFileArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = inputFileArguments.InputFileName;
-        var extension = inputFileName?[(inputFileName.IndexOf('.')+1)..];
+        var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
 
-        var cmd = WrapCommand($"-i {inputFilePath} -vf reverse -af areverse {_videosFolderName}{guid}.{extension}");
+        var cmd = WrapCommand($"-i {inputFilePath} -vf reverse -af areverse {outputFileName}");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -51,13 +52,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Reverse video command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task RotateVideoByAngleAsync(RotateVideoArguments rotateVideoArguments)
+    public async Task<OutputFileArguments?> RotateVideoByAngleAsync(RotateVideoArguments rotateVideoArguments)
     {
         if (rotateVideoArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = rotateVideoArguments.InputFileName;
@@ -65,7 +73,8 @@ public class VideoToolsService : IVideoToolsService
         var angleToRotate = rotateVideoArguments.AngleToRotate;
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -vf rotate={angleToRotate}*PI/180 {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -vf rotate={angleToRotate}*PI/180 {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -79,12 +88,19 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Rotate video by angle command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
-    public async Task CropVideoAsync(CropVideoArguments cropVideoArguments)
+    public async Task<OutputFileArguments?> CropVideoAsync(CropVideoArguments cropVideoArguments)
     {
         if (cropVideoArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = cropVideoArguments.InputFileName;
@@ -96,15 +112,16 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var metadata = _mediaMetadataService.GetMediaMetadata(inputFilePath);
         var videoHeight = metadata.Height;
-        var videoWidth = metadata.Width;        
+        var videoWidth = metadata.Width;
 
         if (height > videoHeight || width > videoWidth)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -filter:v crop={height}:{width}:{x}:{y} {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -filter:v crop={height}:{width}:{x}:{y} {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -118,13 +135,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Crop video command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task CutVideoAsync(CutVideoArguments cutVideoArgunents)
+    public async Task<OutputFileArguments?> CutVideoAsync(CutVideoArguments cutVideoArgunents)
     {
         if (cutVideoArgunents is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = cutVideoArgunents.InputFileName;
@@ -144,11 +168,12 @@ public class VideoToolsService : IVideoToolsService
 
         if (fromInSeconds >= duration || toInSeconds > duration)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -ss {fromHours}:{fromMinutes}:{fromSeconds} -to {toHours}:{toMinutes}:{toSeconds} -c copy {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -ss {fromHours}:{fromMinutes}:{fromSeconds} -to {toHours}:{toMinutes}:{toSeconds} -c copy {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -162,6 +187,13 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Cut video command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
     private static int ToSeconds(int hours, int minutes, int seconds)
@@ -169,11 +201,11 @@ public class VideoToolsService : IVideoToolsService
         return hours * 3600 + minutes * 60 + seconds;
     }
 
-    public async Task ReflectVideoAsync(ReflectVideoArguments reflectVideoArguments)
+    public async Task<OutputFileArguments?> ReflectVideoAsync(ReflectVideoArguments reflectVideoArguments)
     {
         if (reflectVideoArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = reflectVideoArguments.InputFileName;
@@ -182,48 +214,53 @@ public class VideoToolsService : IVideoToolsService
         var reflectHorozontally = reflectVideoArguments.ReflectHorizontally;
         var reflectVertically = reflectVideoArguments.ReflectVertically;
         var guid = Guid.NewGuid();
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
         string? arguments;
 
-        if(reflectHorozontally && reflectVertically)
+        if (reflectHorozontally && reflectVertically)
         {
-            arguments = $"-i {inputFilePath} -vf hflip,vflip {_videosFolderName}{guid}.{extension}";
+            arguments = $"-i {inputFilePath} -vf hflip,vflip {outputFileName}";
         }
         else if (reflectHorozontally)
         {
-            arguments = $"-i {inputFilePath} -vf hflip {_videosFolderName}{guid}.{extension}";
+            arguments = $"-i {inputFilePath} -vf hflip {outputFileName}";
         }
         else if (reflectVertically)
         {
-            arguments = $"-i {inputFilePath} -vf vflip {_videosFolderName}{guid}.{extension}";
+            arguments = $"-i {inputFilePath} -vf vflip {outputFileName}";
         }
         else
         {
-            arguments = null;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
-        if (arguments is not null)
+        _logger.Information(arguments);
+
+        var cmd = WrapCommand(arguments);
+
+        var cmdResult = await cmd.ExecuteBufferedAsync();
+
+        if (cmdResult.ExitCode != 0)
         {
-            _logger.Information(arguments);
+            _logger.Error("Error executing reflect video command. Exit code: {ExitCode}", cmdResult.ExitCode);
+            throw new Exception("Error executing ffmpeg command");
+        }
 
-            var cmd = WrapCommand(arguments);
+        _logger.Information("Reflect video command executed succesfully");
 
-            var cmdResult = await cmd.ExecuteBufferedAsync();
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
 
-            if (cmdResult.ExitCode != 0)
-            {
-                _logger.Error("Error executing reflect video command. Exit code: {ExitCode}", cmdResult.ExitCode);
-                throw new Exception("Error executing ffmpeg command");
-            }
-
-            _logger.Information("Reflect video command executed succesfully");
-        }                
+        return outputArguments;
     }
 
-    public async Task RemoveAudioAsync(InputFileArguments inputFileArguments)
+    public async Task<OutputFileArguments?> RemoveAudioAsync(InputFileArguments inputFileArguments)
     {
         if (inputFileArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = inputFileArguments.InputFileName;
@@ -231,7 +268,8 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -c:v copy -an {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -c:v copy -an {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -245,13 +283,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Remove audio command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ChangeVideoBitrateAsync(ChangeVideoBitrateArguments changeVideoBitrateArguments)
+    public async Task<OutputFileArguments?> ChangeVideoBitrateAsync(ChangeVideoBitrateArguments changeVideoBitrateArguments)
     {
         if (changeVideoBitrateArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = changeVideoBitrateArguments.InputFileName;
@@ -260,7 +305,8 @@ public class VideoToolsService : IVideoToolsService
         var videoBitrate = changeVideoBitrateArguments.VideoBitrate;
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -b:v {videoBitrate} {videoBitrate} {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -b:v {videoBitrate} {videoBitrate} {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -274,13 +320,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Change video bitrate command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ChangeAudioBitrateAsync(ChangeAudioBitrateArguments changeAudioBitrateArguments)
+    public async Task<OutputFileArguments?> ChangeAudioBitrateAsync(ChangeAudioBitrateArguments changeAudioBitrateArguments)
     {
         if (changeAudioBitrateArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = changeAudioBitrateArguments.InputFileName;
@@ -289,7 +342,8 @@ public class VideoToolsService : IVideoToolsService
         var audioBitrate = changeAudioBitrateArguments.AudioBitrate;
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -b:a {audioBitrate} {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -b:a {audioBitrate} {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -303,20 +357,28 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Change audio bitrate command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ExtractAudioAsync(InputFileArguments inputFileArguments)
+    public async Task<OutputFileArguments?> ExtractAudioAsync(InputFileArguments inputFileArguments)
     {
         if (inputFileArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = inputFileArguments.InputFileName;
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -vn {_videosFolderName}{guid}.mp3";
+        var outputFileName = $"{_videosFolderName}{guid}.mp3";
+        var arguments = $"-i {inputFilePath} -vn {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -330,13 +392,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Extract audio command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task WebOptimizeVideoAsync(InputFileArguments inputFileArguments)
+    public async Task<OutputFileArguments?> WebOptimizeVideoAsync(InputFileArguments inputFileArguments)
     {
         if (inputFileArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = inputFileArguments.InputFileName;
@@ -344,7 +413,8 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -movflags +faststart {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -movflags +faststart {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -358,13 +428,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Web optimize video command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task AddWatermarkAsync(AddWatermarkArguments addWaterMarkArguments)
+    public async Task<OutputFileArguments?> AddWatermarkAsync(AddWatermarkArguments addWaterMarkArguments)
     {
         if (addWaterMarkArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = addWaterMarkArguments.InputFileName;
@@ -374,14 +451,15 @@ public class VideoToolsService : IVideoToolsService
 
         if (watermarkFileName is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var watermarkFilePath = $"{_videosFolderName}{watermarkFileName}";
         var x = addWaterMarkArguments.X;
         var y = addWaterMarkArguments.Y;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -i {watermarkFilePath} -filter_complex overlay={x}:{y} {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -i {watermarkFilePath} -filter_complex overlay={x}:{y} {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -395,13 +473,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Add watermark command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task AddAudioAsync(AddAudioArguments addAudioArguments)
+    public async Task<OutputFileArguments?> AddAudioAsync(AddAudioArguments addAudioArguments)
     {
         if (addAudioArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = addAudioArguments.InputFileName;
@@ -410,7 +495,8 @@ public class VideoToolsService : IVideoToolsService
         var audioFileName = addAudioArguments.AudioFileName;
         var audioFilePath = $"{_videosFolderName}{audioFileName}";
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -i {audioFilePath} -c copy -shortest {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -i {audioFilePath} -c copy -shortest {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -424,13 +510,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Add audio command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task AddSubtitlesAsync(AddSubtitlesArguments addSubtitlesArguments)
+    public async Task<OutputFileArguments?> AddSubtitlesAsync(AddSubtitlesArguments addSubtitlesArguments)
     {
         if (addSubtitlesArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = addSubtitlesArguments.InputFileName;
@@ -440,23 +533,24 @@ public class VideoToolsService : IVideoToolsService
         var subtitlesFilePath = $"{_videosFolderName}{subtitlesFileName}";
         var subtitlesExtension = subtitlesFileName?[(subtitlesFileName.IndexOf('.') + 1)..];
         var guid = Guid.NewGuid();
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
         string? arguments = null;
 
         if (subtitlesExtension == "srt")
         {
-            arguments = $"-i {inputFilePath} -vf subtitles={subtitlesFilePath} -c:s mov_text  {_videosFolderName}{guid}.{extension}";
-            _logger.Information(arguments);
-        }
-        
-        if(subtitlesExtension == "ass")
-        {
-            arguments = $"-i {inputFilePath} -vf ass={subtitlesFilePath} -c:s mov_text  {_videosFolderName}{guid}.{extension}";
+            arguments = $"-i {inputFilePath} -vf subtitles={subtitlesFilePath} -c:s mov_text  {outputFileName}";
             _logger.Information(arguments);
         }
 
-        if(arguments is null)
+        if (subtitlesExtension == "ass")
         {
-            return;
+            arguments = $"-i {inputFilePath} -vf ass={subtitlesFilePath} -c:s mov_text  {outputFileName}";
+            _logger.Information(arguments);
+        }
+
+        if (arguments is null)
+        {
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var cmd = WrapCommand(arguments);
@@ -470,13 +564,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Add subtitles command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoSpeedArguments)
+    public async Task<OutputFileArguments?> ChangeVideoSpeedAsync(ChangeVideoSpeedArguments changeVideoSpeedArguments)
     {
         if (changeVideoSpeedArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = changeVideoSpeedArguments.InputFileName;
@@ -484,7 +585,8 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var speedChangeCoefficient = changeVideoSpeedArguments.SpeedChangeCoefficient;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -filter_complex [0:v]setpts={speedChangeCoefficient.ToString().Replace(',', '.')}*PTS[v];[0:a]atempo={Math.Round(1/speedChangeCoefficient,2).ToString().Replace(',', '.')}[a] -map [v] -map [a] {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -filter_complex [0:v]setpts={speedChangeCoefficient.ToString().Replace(',', '.')}*PTS[v];[0:a]atempo={Math.Round(1 / speedChangeCoefficient, 2).ToString().Replace(',', '.')}[a] -map [v] -map [a] {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -498,13 +600,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Change video speed command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ChangeVideoFramerateAsync(ChangeVideoFramerateArguments changeVideoFramerateArguments)
+    public async Task<OutputFileArguments?> ChangeVideoFramerateAsync(ChangeVideoFramerateArguments changeVideoFramerateArguments)
     {
         if (changeVideoFramerateArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = changeVideoFramerateArguments.InputFileName;
@@ -512,13 +621,14 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var desiredFramerate = changeVideoFramerateArguments.DesiredFramerate;
 
-        if(desiredFramerate < 0)
+        if (desiredFramerate < 0)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -r {desiredFramerate} {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -r {desiredFramerate} {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -532,13 +642,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Change video framerate command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ChangeAudioVolumeAsync(ChangeAudioVolumeArguments changeAudioVolumeArguments)
+    public async Task<OutputFileArguments?> ChangeAudioVolumeAsync(ChangeAudioVolumeArguments changeAudioVolumeArguments)
     {
         if (changeAudioVolumeArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = changeAudioVolumeArguments.InputFileName;
@@ -546,7 +663,8 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var volumeChangeCoefficient = changeAudioVolumeArguments.VolumeChangeCoefficient;
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -filter:a volume={volumeChangeCoefficient.ToString().Replace(',', '.')} {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -filter:a volume={volumeChangeCoefficient.ToString().Replace(',', '.')} {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -560,13 +678,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Change audio volume command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ChangeVideoResolutionAsync(ChangeVideoResolutionArguments changeVideoResolutionArguments)
+    public async Task<OutputFileArguments?> ChangeVideoResolutionAsync(ChangeVideoResolutionArguments changeVideoResolutionArguments)
     {
         if (changeVideoResolutionArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = changeVideoResolutionArguments.InputFileName;
@@ -574,7 +699,8 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var resolution = changeVideoResolutionArguments.Resolution.GetEnumMemberValue();
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} -vf scale={resolution} -c:a copy {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} -vf scale={resolution} -c:a copy {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -588,13 +714,20 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Change audio volume command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task ExtractSingleFrameAsync(ExtractSingleFrameArguments extractSingleFrameArguments)
+    public async Task<OutputFileArguments?> ExtractSingleFrameAsync(ExtractSingleFrameArguments extractSingleFrameArguments)
     {
         if (extractSingleFrameArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = extractSingleFrameArguments.InputFileName;
@@ -608,10 +741,11 @@ public class VideoToolsService : IVideoToolsService
 
         if (durationInSeconds > metadata.Duration || framenumber > metadata.FrameRate)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var guid = Guid.NewGuid();
+        var outputFileName = $"{_videosFolderName}{guid}.png";
         var arguments = $"-i {inputFilePath} -ss {hour}:{minute}:{second} -vframes 1 {_videosFolderName}{guid}.png";
         _logger.Information(arguments);
 
@@ -626,28 +760,42 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Extract single frame command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
-    public async Task MergeVideosAsync(MergeVideosArguments mergeVideosArguments)
+    public async Task<OutputFileArguments?> MergeVideosAsync(MergeVideosArguments mergeVideosArguments)
     {
         if (mergeVideosArguments is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var inputFileName = mergeVideosArguments.InputFileName;
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
-        var videosToMerge = mergeVideosArguments.VideosToMerge;        
+        var videosToMerge = mergeVideosArguments.VideosToMerge;
+
+        if(videosToMerge is null)
+        {
+            return await Task.FromResult<OutputFileArguments?>(null);
+        }
+
         var videosToMergeArgument = GetVideosToMerge(videosToMerge);
 
         if (videosToMergeArgument is null)
         {
-            return;
+            return await Task.FromResult<OutputFileArguments?>(null);
         }
 
         var guid = Guid.NewGuid();
-        var arguments = $"-i {inputFilePath} {videosToMergeArgument}-filter_complex [0:v:0][0:a:0][1:v:0][1:a:0]concat=n={videosToMerge.Count + 1}:v=1:a=1 {_videosFolderName}{guid}.{extension}";
+        var outputFileName = $"{_videosFolderName}{guid}.{extension}";
+        var arguments = $"-i {inputFilePath} {videosToMergeArgument}-filter_complex [0:v:0][0:a:0][1:v:0][1:a:0]concat=n={videosToMerge.Count + 1}:v=1:a=1 {outputFileName}";
         _logger.Information(arguments);
 
         var cmd = WrapCommand(arguments);
@@ -661,6 +809,13 @@ public class VideoToolsService : IVideoToolsService
         }
 
         _logger.Information("Merge videos command executed succesfully");
+
+        var outputArguments = new OutputFileArguments
+        {
+            OutputFileName = outputFileName
+        };
+
+        return outputArguments;
     }
 
     private string GetVideosToMerge(IList<string> videosToMerge)

@@ -19,7 +19,19 @@
     private const int _maxAllowedSize = 2000 * 1024 * 1024;
     private List<string> _errors = new();
 
-    public static string? FileName { get; set; } = "test.mp4";
+    private static string? _fileName = "test.mp4";
+
+    public static string? FileName
+    {
+        get => _fileName;
+        set
+        {
+            if (value != _fileName)
+            {
+                _fileName = value;
+            }
+        }
+    }
 
     private async Task OnChange(InputFileChangeEventArgs e)
     {
@@ -32,8 +44,7 @@
                 Path.GetRandomFileName(),
                 Path.GetExtension(file.Name));
 
-            FileName = newFileName;
-            _errors.Add(FileName);
+            SingleVideoUploader.FileName = newFileName;
 
             var path = Path.Combine(config.GetValue<string>("FileStorage")!, "Uploads", newFileName);
 

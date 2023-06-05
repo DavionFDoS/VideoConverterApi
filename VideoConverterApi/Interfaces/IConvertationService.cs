@@ -4,20 +4,20 @@ namespace VideoConverterApi.Interfaces;
 
 public interface IConvertationService
 {
-    Task ConvertTo3GPWithNoArguments(InputFileArguments inputFileArguments);
-    Task<OutputFileArguments> ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments);
-    Task<OutputFileArguments> ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToFLVWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToGIFWithArguments(ConvertToGIFArguments convertToGIFArguments);
-    Task ConvertToMKVWithArguments(ConvertToMKVArguments convertToMKVArguments);
-    Task ConvertToMKVWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToMOVWithArguments(ConvertToMOVArguments convertToMOVArguments);
-    Task ConvertToMOVWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToMP4WithArguments(ConvertToMP4Arguments convertToMP4Arguments);
-    Task ConvertToMP4WithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToMPEGWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToSeriesOfImages(ConvertToSeriesOfImagesArguments convertToSeriesOfImagesArguments);
-    Task ConvertToWebMWithArguments(ConvertToWebmArguments convertToWebmArguments);
-    Task ConvertToWebMWithNoArguments(InputFileArguments inputFileArguments);
-    Task ConvertToWMVWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertTo3GPWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToAVIWithArguments(ConvertToAVIArguments convertToAVIArguments);
+    Task<OutputFileArguments?> ConvertToAVIWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToFLVWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToGIFWithArguments(ConvertToGIFArguments convertToGIFArguments);
+    Task<OutputFileArguments?> ConvertToMKVWithArguments(ConvertToMKVArguments convertToMKVArguments);
+    Task<OutputFileArguments?> ConvertToMKVWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToMOVWithArguments(ConvertToMOVArguments convertToMOVArguments);
+    Task<OutputFileArguments?> ConvertToMOVWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToMP4WithArguments(ConvertToMP4Arguments convertToMP4Arguments);
+    Task<OutputFileArguments?> ConvertToMP4WithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToMPEGWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToSeriesOfImages(ConvertToSeriesOfImagesArguments convertToSeriesOfImagesArguments);
+    Task<OutputFileArguments?> ConvertToWebMWithArguments(ConvertToWebmArguments convertToWebmArguments);
+    Task<OutputFileArguments?> ConvertToWebMWithNoArguments(InputFileArguments inputFileArguments);
+    Task<OutputFileArguments?> ConvertToWMVWithNoArguments(InputFileArguments inputFileArguments);
 }

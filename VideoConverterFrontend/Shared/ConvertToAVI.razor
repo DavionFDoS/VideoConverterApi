@@ -4,12 +4,10 @@
 @inject IJSRuntime JsRuntime
 
 <h3>ConvertToAVI</h3>
+<br />
 
-<SingleVideoUploader />
-
-<h4>Advanced Settings</h4>
-
-<button @onclick="ToggleAdvancedSettings">Откртыть расширенные настройки</button>
+<button @onclick="ToggleAdvancedSettings">Открыть расширенные настройки</button>
+<br />
 
 @if (showAdvancedSettings)
 {
@@ -37,7 +35,7 @@
     <input type="number" @bind="audioBitrate" />
     <label>bits/s</label>
 
-    <h5>Quality Value (0 - 10 range)</h5>
+    <h5>Quality Value (0 - 10)</h5>
     <input type="number" @bind="qv" />
 
     <h5>Preset</h5>
@@ -47,6 +45,7 @@
             <option value="@preset">@preset</option>
         }
     </select>
+    <br />
 }
 
 <div>
@@ -57,7 +56,7 @@
         }
         else
         {
-            <span>Convert</span>
+            <span>Конвертировать</span>
         }
     </button>
 </div>
@@ -68,7 +67,7 @@
         <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        <p>Converting video, please wait...</p>
+        <p>Видео конвертируется...</p>
     </div>
 }
 
@@ -96,7 +95,8 @@
     private int audioBitrate;
     private int qv;
     private Presets selectedPreset;
-    private string _apiBaseURL = "https://localhost:44337/";
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
     private List<string> _errors = new();
 
     private void ToggleAdvancedSettings()
@@ -121,17 +121,17 @@
                     Qv = qv
                 };
 
-            _errors.Add(arguments.InputFileName!);
-
             var response = await client.PostAsJsonAsync($"{_apiBaseURL}/converttoaviwitharguments", arguments);
 
             if (response.IsSuccessStatusCode)
             {
-                // Get the download URL or file path from the response
-                string downloadUrl = await response.Content.ReadAsStringAsync();
+                string content = await response.Content.ReadAsStringAsync();
+                var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+                string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+                _errors.Add(downloadUrl);
 
                 // Trigger the download in the browser
-                await JsRuntime.InvokeAsync<object>("open", downloadUrl, "_blank");
+                await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
             }
             else
             {
@@ -147,18 +147,17 @@
                     InputFileName = InputFileName
                 };
 
-            _errors.Add(arguments.InputFileName!);
-
-            var response = await client.PostAsJsonAsync($"{_apiBaseURL}converttoaviwithnoarguments", arguments);
+            var response = await client.PostAsJsonAsync($"{_apiBaseURL}/converttoaviwithnoarguments", arguments);
 
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
-                var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "");
-                string downloadUrl = $"{_apiBaseURL}/download?filePath={outputFileName}";
+                var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+                string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
                 _errors.Add(downloadUrl);
+
                 // Trigger the download in the browser
-                await JsRuntime.InvokeAsync<object>("open", downloadUrl, "_blank");
+                await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
             }
             else
             {

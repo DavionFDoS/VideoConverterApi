@@ -7,6 +7,10 @@
 
 <h3>Video Converter</h3>
 
+<SingleVideoUploader />
+
+<tr></tr>
+
 <h4>Supported Formats</h4>
 <select @bind="selectedFormat">
     @foreach (var format in Enum.GetValues(typeof(VideoFormat)))
@@ -26,7 +30,7 @@
     private Dictionary<VideoFormat, Type> conversionComponents;
     private Dictionary<string, object> parameters = new Dictionary<string, object>()
     {
-        { "InputFileName", SingleVideoUploader.FileName }
+        { "InputFileName", SingleVideoUploader.FileName! }
     };
 
     protected override void OnInitialized()
