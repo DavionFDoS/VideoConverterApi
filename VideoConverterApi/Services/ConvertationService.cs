@@ -443,8 +443,11 @@ public class ConvertationService : IConvertationService
             {
                 var fileInfo = new FileInfo(image);
                 zipArchive.CreateEntryFromFile(fileInfo.FullName, fileInfo.Name);
+                File.Delete(image);
             }
         }
+
+
 
         var outputArguments = new OutputFileArguments
         {

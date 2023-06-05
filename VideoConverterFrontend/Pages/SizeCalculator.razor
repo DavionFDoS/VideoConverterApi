@@ -1,0 +1,109 @@
+﻿@page "/sizecalculator"
+@inject HttpClient client
+
+@using System.Text.Json;
+@using VideoConverterApi.Enums;
+@using VideoConverterApi.Models;
+
+<PageTitle>Size Calculator</PageTitle>
+
+<h3>Size Calculator</h3>
+<br />
+
+<div class="form-group">
+    <label for="videoBitrate">Битрейт видео:</label>
+    <input id="videoBitrate" class="form-control" @bind="_videoBitrateAsString" />
+</div>
+
+<div class="form-group">
+    <label for="audioBitrate">Битрейт аудио:</label>
+    <input id="audioBitrate" class="form-control" @bind="_audioBitrateAsString" />
+</div>
+
+<div class="form-group">
+    <label for="duration">Длительность видео:</label>
+    <input id="duration" class="form-control" @bind="_duration" />
+</div>
+
+<div class="form-group">
+    <label for="overheadFactor">Видеокодек:</label>
+    <select id="overheadFactor" class="form-control" @bind="_overheadFactor">
+        @foreach (var value in Enum.GetValues(typeof(OverheadFactor)))
+        {
+            <option value="@value">@value</option>
+        }
+    </select>
+    <br />
+</div>
+
+<div>
+    <button class="btn btn-primary" @onclick="CalculateSize">Расчитать размер видеофайла</button>
+</div>
+
+<div class="mt-3">
+    <br />
+    <h4>Примерный размер файла:</h4>
+    <div>
+        <strong>В битах:</strong> @_sizeInBits
+    </div>
+    <div>
+        <strong>В мегабайтах:</strong> @_sizeInMegabytes
+    </div>
+</div>
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code{
+    private string? _videoBitrateAsString;
+    private string? _audioBitrateAsString;
+    private double _duration;
+    private OverheadFactor _overheadFactor;
+    private int _sizeInBits;
+    private double _sizeInMegabytes;
+    private string _apiBaseURL = "https://localhost:44337";
+    private List<string> _errors = new();
+
+
+    private async Task CalculateSize()
+    {
+        _errors.Clear();
+
+        var arguments = new SizeCalculationVariables
+            {
+                VideoBitrateAsString = _videoBitrateAsString,
+                AudioBitrateAsString = _audioBitrateAsString,
+                Duration = _duration,
+                OverheadFactor = _overheadFactor
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/precalculatevideosize", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            _errors.Add(content);
+
+            var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+            PrecalculatedSize precaculatedSize = JsonSerializer.Deserialize<PrecalculatedSize>(content, options)!;
+            _sizeInBits = precaculatedSize.SizeInBits;
+            _sizeInMegabytes = precaculatedSize.SizeInMegaBytes;
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+    }
+}
