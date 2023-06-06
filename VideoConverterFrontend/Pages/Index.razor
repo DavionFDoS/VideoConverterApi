@@ -1,17 +1,16 @@
 ﻿@page "/"
-@using System.Net.Http
 @using System.Threading.Tasks
 @using Microsoft.AspNetCore.Components
 
 <PageTitle>VideoConverter</PageTitle>
 
-<h3>Video Converter</h3>
+<h3>Видео конвертер</h3>
 
 <SingleVideoUploader />
 
 <tr></tr>
 
-<h4>Supported Formats</h4>
+<h4>Поддерживаемые форматы</h4>
 <select @bind="selectedFormat">
     @foreach (var format in Enum.GetValues(typeof(VideoFormat)))
     {

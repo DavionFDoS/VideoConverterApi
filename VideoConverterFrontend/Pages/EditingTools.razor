@@ -1,3 +1,111 @@
 ﻿@page "/editingtools"
 
-<PageTitle>Editing Tools</PageTitle>
+@using Microsoft.AspNetCore.Components
+@using System.Runtime.Serialization;
+
+<PageTitle>Видео инструменты</PageTitle>
+
+<h3>Видео инструменты</h3>
+
+<SingleVideoUploader />
+
+<tr></tr>
+<br/>
+
+<h4>Выберите инструмент</h4>
+<select @bind="selectedTool">
+    @foreach (var format in Enum.GetValues(typeof(VideoTool)))
+    {
+        <option value="@format">@format</option>
+    }
+</select>
+
+@if (selectedTool != null)
+{
+    <DynamicComponent Type="GetConversionComponentType(selectedTool)" Parameters="parameters" />
+}
+
+@code {
+    private VideoTool selectedTool;
+    private string? inputFileName = SingleVideoUploader.FileName;
+    private Dictionary<VideoTool, Type> videoToolsComponents;
+    private Dictionary<string, object> parameters = new Dictionary<string, object>()
+    {
+        { "InputFileName", SingleVideoUploader.FileName! }
+    };
+
+    protected override void OnInitialized()
+    {
+        videoToolsComponents = new Dictionary<VideoTool, Type>
+        {
+            { VideoTool.ReverseVideo, typeof(ReverseVideo) },
+            { VideoTool.RotateVideo, typeof(RotateVideo) },
+            { VideoTool.CropVideo, typeof(CropVideo) },
+            { VideoTool.CutVideo, typeof(CutVideo) },
+            { VideoTool.ReflectVideo, typeof(ReflectVideo) },
+            { VideoTool.RemoveAudio, typeof(RemoveAudio) },
+            { VideoTool.ChangeVideoBitrate, typeof(ChangeVideoBitrate) },
+            { VideoTool.ChangeAudioBitrate, typeof(ChangeAudioBitrate) },
+            { VideoTool.ExtractAudio, typeof(ExtractAudio) },
+            { VideoTool.WebOptimizeVideo, typeof(WebOptimizeVideo) },
+            { VideoTool.AddWatermark, typeof(AddWatermark) },
+            { VideoTool.AddAudio, typeof(AddAudio) },
+            { VideoTool.AddSubtitles, typeof(AddSubtitles) },
+            { VideoTool.ChangeVideoSpeed, typeof(ChangeVideoSpeed) },
+            { VideoTool.ChangeVideoFramerate, typeof(ChangeVideoFramerate) },
+            { VideoTool.ChangeAudioVolume, typeof(ChangeAudioVolume) },
+            { VideoTool.ChangeVideoResolution, typeof(ChangeVideoResolution) },
+            { VideoTool.ExtractSingleFrame, typeof(ExtractSingleFrame) },
+            { VideoTool.MergeVideos, typeof(MergeVideos) }
+        };
+
+        base.OnInitialized();
+    }
+
+    private Type GetConversionComponentType(VideoTool format)
+    {
+        return videoToolsComponents.ContainsKey(format) ? videoToolsComponents[format] : null;
+    }
+
+    private enum VideoTool
+    {
+        [EnumMember(Value = "Обратное видео")]
+        ReverseVideo,
+        [EnumMember(Value = "Повернуть видео")]
+        RotateVideo,
+        [EnumMember(Value = "Кадрировать видео")]
+        CropVideo,
+        [EnumMember(Value = "Обрезать видео")]
+        CutVideo,
+        [EnumMember(Value = "Отразить видео")]
+        ReflectVideo,
+        [EnumMember(Value = "Удалить аудио")]
+        RemoveAudio,
+        [EnumMember(Value = "Изменить битрейт видео")]
+        ChangeVideoBitrate,
+        [EnumMember(Value = "Изменить битрейт аудио")]
+        ChangeAudioBitrate,
+        [EnumMember(Value = "Извлечь аудио")]
+        ExtractAudio,
+        [EnumMember(Value = "Веб-оптимизировать видео")]
+        WebOptimizeVideo,
+        [EnumMember(Value = "Добавить водяной знак")]
+        AddWatermark,
+        [EnumMember(Value = "Добавить аудио")]
+        AddAudio,
+        [EnumMember(Value = "Добавить субтитры")]
+        AddSubtitles,
+        [EnumMember(Value = "Изменить скорость видео")]
+        ChangeVideoSpeed,
+        [EnumMember(Value = "Изменить фреймрейт видео")]
+        ChangeVideoFramerate,
+        [EnumMember(Value = "Изменить громкость звука")]
+        ChangeAudioVolume,
+        [EnumMember(Value = "Изменить разрешение видео")]
+        ChangeVideoResolution,
+        [EnumMember(Value = "Извлечь кадр")]
+        ExtractSingleFrame,
+        [EnumMember(Value = "Объединить видео")]
+        MergeVideos
+    }
+}

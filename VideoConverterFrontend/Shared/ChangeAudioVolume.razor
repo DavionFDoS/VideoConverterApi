@@ -1,0 +1,93 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+
+<h3>Изменить громкость аудио</h3>
+<br />
+
+<h5>Коэффициент изменения громкости</h5>
+<input type="text" @bind="_volumeChangeCoefficientAsString" />
+<br />
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="ChangeVolume" disabled="@_inProgress">
+        @if (_inProgress)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Выполнить операцию</span>
+        }
+    </button>
+</div>
+
+@if (_inProgress)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Операция выполняется...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool _inProgress = false;
+    private string? _volumeChangeCoefficientAsString;
+    private double _volumeChangeCoefficient;
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
+    private List<string> _errors = new();
+
+    private async Task ChangeVolume()
+    {
+        _inProgress = true;
+
+        if (!Double.TryParse(_volumeChangeCoefficientAsString, out _volumeChangeCoefficient))
+        {
+            _inProgress = false;
+            return;
+        }
+
+        var arguments = new ChangeAudioVolumeArguments
+            {
+                InputFileName = InputFileName,
+                VolumeChangeCoefficient = _volumeChangeCoefficient
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/changeaudiovolume", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+            string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+
+            // Trigger the download in the browser
+            await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+
+        _inProgress = false;
+    }
+}

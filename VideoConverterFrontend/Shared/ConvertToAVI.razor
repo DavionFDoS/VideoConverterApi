@@ -9,10 +9,10 @@
 <button @onclick="ToggleAdvancedSettings">Открыть расширенные настройки</button>
 <br />
 
-@if (showAdvancedSettings)
+@if (_showAdvancedSettings)
 {
     <h5>Video Codec</h5>
-    <select @bind="selectedVideoCodec">
+    <select @bind="_selectedVideoCodec">
         @foreach (var codec in Enum.GetValues(typeof(AVICompatibleVideoCodecs)))
         {
             <option value="@codec">@codec</option>
@@ -20,7 +20,7 @@
     </select>
 
     <h5>Audio Codec</h5>
-    <select @bind="selectedAudioCodec">
+    <select @bind="_selectedAudioCodec">
         @foreach (var codec in Enum.GetValues(typeof(AVICompatibleAudioCodecs)))
         {
             <option value="@codec">@codec</option>
@@ -28,18 +28,18 @@
     </select>
 
     <h5>Video Bitrate</h5>
-    <input type="number" @bind="videoBitrate" />
+    <input type="number" @bind="_videoBitrate" />
     <label>bits/s</label>
 
     <h5>Audio Bitrate</h5>
-    <input type="number" @bind="audioBitrate" />
+    <input type="number" @bind="_audioBitrate" />
     <label>bits/s</label>
 
     <h5>Quality Value (0 - 10)</h5>
-    <input type="number" @bind="qv" />
+    <input type="number" @bind="_qv" />
 
     <h5>Preset</h5>
-    <select @bind="selectedPreset">
+    <select @bind="_selectedPreset">
         @foreach (var preset in Enum.GetValues(typeof(Presets)))
         {
             <option value="@preset">@preset</option>
@@ -49,8 +49,8 @@
 }
 
 <div>
-    <button type="button" class="btn btn-primary" @onclick="ConvertVideo" disabled="@isConverting">
-        @if (isConverting)
+    <button type="button" class="btn btn-primary" @onclick="ConvertVideo" disabled="@_isConverting">
+        @if (_isConverting)
         {
             <span class="spinner-border spinner-border-sm"></span>
         }
@@ -61,7 +61,7 @@
     </button>
 </div>
 
-@if (isConverting)
+@if (_isConverting)
 {
     <div class="loading-screen">
         <div class="spinner-border" role="status">
@@ -87,38 +87,38 @@
     [Parameter]
     public string? InputFileName { get; set; }
 
-    private bool showAdvancedSettings;
-    private bool isConverting = false;
-    private AVICompatibleVideoCodecs selectedVideoCodec;
-    private AVICompatibleAudioCodecs selectedAudioCodec;
-    private int videoBitrate;
-    private int audioBitrate;
-    private int qv;
-    private Presets selectedPreset;
+    private bool _showAdvancedSettings;
+    private bool _isConverting = false;
+    private AVICompatibleVideoCodecs _selectedVideoCodec;
+    private AVICompatibleAudioCodecs _selectedAudioCodec;
+    private int _videoBitrate;
+    private int _audioBitrate;
+    private int _qv;
+    private Presets _selectedPreset;
     private string _apiBaseURL = "https://localhost:44337";
     private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
     private List<string> _errors = new();
 
     private void ToggleAdvancedSettings()
     {
-        showAdvancedSettings = !showAdvancedSettings;
+        _showAdvancedSettings = !_showAdvancedSettings;
     }
 
     private async Task ConvertVideo()
     {
-        isConverting = true;
+        _isConverting = true;
 
-        if (showAdvancedSettings)
+        if (_showAdvancedSettings)
         {
             var arguments = new ConvertToAVIArguments
                 {
                     InputFileName = InputFileName,
-                    AVICompatibleVideoCodecs = selectedVideoCodec,
-                    AVICompatibleAudioCodecs = selectedAudioCodec,
-                    VideoBitrate = videoBitrate,
-                    AudioBitrate = audioBitrate,
-                    Preset = selectedPreset,
-                    Qv = qv
+                    AVICompatibleVideoCodecs = _selectedVideoCodec,
+                    AVICompatibleAudioCodecs = _selectedAudioCodec,
+                    VideoBitrate = _videoBitrate,
+                    AudioBitrate = _audioBitrate,
+                    Preset = _selectedPreset,
+                    Qv = _qv
                 };
 
             var response = await client.PostAsJsonAsync($"{_apiBaseURL}/converttoaviwitharguments", arguments);
@@ -138,7 +138,7 @@
                 _errors.Add(response.StatusCode.ToString());
             }
 
-            isConverting = false;
+            _isConverting = false;
         }
         else
         {
@@ -164,7 +164,7 @@
                 _errors.Add(response.StatusCode.ToString());
             }
 
-            isConverting = false;
+            _isConverting = false;
         }
     }
 }

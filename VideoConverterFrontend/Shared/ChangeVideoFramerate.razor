@@ -1,0 +1,87 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+
+<h3>Изменить фреймрейт видео</h3>
+<br />
+
+<h5>Желаемый фреймрейт</h5>
+<input type="number" @bind="_desiredFramerate" />
+<label>кардов/с</label>
+<br />
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="ChangeFramerate" disabled="@_inProgress">
+        @if (_inProgress)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Выполнить операцию</span>
+        }
+    </button>
+</div>
+
+@if (_inProgress)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Операция выполняется...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool _inProgress = false;
+    private int _desiredFramerate;
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
+    private List<string> _errors = new();
+
+    private async Task ChangeFramerate()
+    {
+        _inProgress = true;
+
+        var arguments = new ChangeVideoFramerateArguments
+            {
+                InputFileName = InputFileName,
+                DesiredFramerate = _desiredFramerate
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/changevideoframerate", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+            string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+
+            // Trigger the download in the browser
+            await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+
+        _inProgress = false;
+    }
+}

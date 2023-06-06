@@ -1,0 +1,109 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+
+<h3>Кадрировать видео</h3>
+<br />
+
+<div class="form-group">
+    <label for="height">Высота:</label>
+    <input id="height" class="form-control" @bind="_height" />
+</div>
+
+<div class="form-group">
+    <label for="width">Ширина:</label>
+    <input id="width" class="form-control" @bind="_width" />
+</div>
+
+<div class="form-group">
+    <label for="x">Координата X:</label>
+    <input id="x" class="form-control" @bind="_x" />
+</div>
+
+<div class="form-group">
+    <label for="y">Координата Y:</label>
+    <input id="y" class="form-control" @bind="_y" />
+</div>
+<br />
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="Crop" disabled="@_inProgress">
+        @if (_inProgress)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Выполнить операцию</span>
+        }
+    </button>
+</div>
+
+@if (_inProgress)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Операция выполняется...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool _inProgress = false;
+    private int _height;
+    private int _width;
+    private int _x;
+    private int _y;
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
+    private List<string> _errors = new();
+
+    private async Task Crop()
+    {
+        _inProgress = true;
+
+        var arguments = new CropVideoArguments
+            {
+                InputFileName = InputFileName,
+                Height = _height,
+                Width = _width,
+                X = _x,
+                Y = _y
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/cropvideo", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+            string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+
+            // Trigger the download in the browser
+            await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+
+        _inProgress = false;
+    }
+}

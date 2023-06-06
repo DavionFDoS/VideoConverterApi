@@ -1,0 +1,120 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+@inject IConfiguration config
+
+<h3>Добавить аудио</h3>
+<br />
+
+<label for="AudioFileName">Выберите аудиофайл</label>
+<div>
+    <InputFile multiple="false" accept="audio/*" OnChange="@OnChange" />
+</div>
+<br />
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="AddAudioToVideo" disabled="@_inProgress">
+        @if (_inProgress)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Выполнить операцию</span>
+        }
+    </button>
+</div>
+
+@if (_inProgress)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Операция выполняется...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool _inProgress = false;
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
+    private List<string> _errors = new();
+    private const int _maxAllowedSize = 2000 * 1024 * 1024;
+
+    public string? AudioFileName { get; set; }
+
+    private async Task OnChange(InputFileChangeEventArgs e)
+    {
+        _errors.Clear();
+        var file = e.File;
+
+        try
+        {
+            var newFileName = Path.ChangeExtension(
+                Path.GetRandomFileName(),
+                Path.GetExtension(file.Name));
+
+            SingleVideoUploader.FileName = newFileName;
+            AudioFileName = newFileName;
+
+            var path = Path.Combine(config.GetValue<string>("FileStorage")!, "Uploads", newFileName);
+
+            Directory.CreateDirectory(
+            Path.Combine(config.GetValue<string>("FileStorage")!, "Uploads"));
+
+            await using FileStream fs = new(path, FileMode.Create);
+            await file.OpenReadStream(_maxAllowedSize).CopyToAsync(fs);
+        }
+        catch (Exception ex)
+        {
+            _errors.Add($"File {file.Name} Error: {ex.Message}");
+            throw;
+        }
+    }
+
+    private async Task AddAudioToVideo()
+    {
+        _inProgress = true;
+
+        var arguments = new AddAudioArguments
+            {
+                InputFileName = InputFileName,
+                AudioFileName = AudioFileName
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/addaudio", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+            string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+
+            // Trigger the download in the browser
+            await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+
+        _inProgress = false;
+    }
+}

@@ -1,0 +1,122 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+
+<h3>Обрезать видео</h3>
+<br />
+
+<div class="form-group">
+    <label for="fromHours">С (часов):</label>
+    <input id="fromHours" class="form-control" @bind="_fromHours" />
+</div>
+
+<div class="form-group">
+    <label for="fromMinutes">С (минут):</label>
+    <input id="fromMinutes" class="form-control" @bind="_fromMinutes" />
+</div>
+
+<div class="form-group">
+    <label for="fromSeconds">С (секунд):</label>
+    <input id="fromSeconds" class="form-control" @bind="_fromSeconds" />
+</div>
+
+<div class="form-group">
+    <label for="toHours">До (часов):</label>
+    <input id="toHours" class="form-control" @bind="_toHours" />
+</div>
+
+<div class="form-group">
+    <label for="toMinutes">До (минут):</label>
+    <input id="toMinutes" class="form-control" @bind="_toMinutes" />
+</div>
+
+<div class="form-group">
+    <label for="toSeconds">До (секунд):</label>
+    <input id="toSeconds" class="form-control" @bind="_toSeconds" />
+</div>
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="Cut" disabled="@_inProgress">
+        @if (_inProgress)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Выполнить операцию</span>
+        }
+    </button>
+</div>
+
+@if (_inProgress)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Операция выполняется...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool _inProgress = false;
+    private int _fromHours;
+    private int _fromMinutes;
+    private int _fromSeconds;
+    private int _toHours;
+    private int _toMinutes;
+    private int _toSeconds;
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
+    private List<string> _errors = new();
+
+    private async Task Cut()
+    {
+        _inProgress = true;
+
+        var arguments = new CutVideoArguments
+            {
+                InputFileName = InputFileName,
+                FromHours = _fromHours,
+                FromMinutes = _fromMinutes,
+                FromSeconds = _fromSeconds,
+                ToHours = _toHours,
+                ToMinutes = _toMinutes,
+                ToSeconds = _toSeconds,
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/cutvideo", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+            string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+
+            // Trigger the download in the browser
+            await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+
+        _inProgress = false;
+    }
+}

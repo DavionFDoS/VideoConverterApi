@@ -1,0 +1,99 @@
+﻿@using VideoConverterApi.Enums
+@using VideoConverterApi.Models
+@inject HttpClient client
+@inject IJSRuntime JsRuntime
+
+<h3>Отразить видео</h3>
+<br />
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="reflectHorizontally" @bind="_reflectHorizontally" />
+    <label class="form-check-label" for="reflectHorizontally">
+        Reflect Horizontally
+    </label>
+</div>
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="reflectVertically" @bind="_reflectVertically" />
+    <label class="form-check-label" for="reflectVertically">
+        Reflect Vertically
+    </label>
+</div>
+
+<div>
+    <button type="button" class="btn btn-primary" @onclick="Reflect" disabled="@_inProgress">
+        @if (_inProgress)
+        {
+            <span class="spinner-border spinner-border-sm"></span>
+        }
+        else
+        {
+            <span>Выполнить операцию</span>
+        }
+    </button>
+</div>
+
+@if (_inProgress)
+{
+    <div class="loading-screen">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Операция выполняется...</p>
+    </div>
+}
+
+@if (_errors.Count > 0)
+{
+    <h2>Errors</h2>
+    <ul class=" text-danger">
+        @foreach (var error in _errors)
+        {
+            <li>@error</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? InputFileName { get; set; }
+
+    private bool _inProgress = false;
+    private bool _reflectHorizontally;
+    private bool _reflectVertically;
+    private string _apiBaseURL = "https://localhost:44337";
+    private string _directoryPath = @"C:\Users\Matvey\source\repos\VideoConverterApi\VideoConverterApi\Videos\Uploads\";
+    private List<string> _errors = new();
+
+    private async Task Reflect()
+    {
+        _inProgress = true;
+
+        var arguments = new ReflectVideoArguments
+            {
+                InputFileName = InputFileName,
+                ReflectHorizontally = _reflectHorizontally,
+                ReflectVertically = _reflectVertically
+
+            };
+
+        var response = await client.PostAsJsonAsync($"{_apiBaseURL}/reflectvideo", arguments);
+
+        if (response.IsSuccessStatusCode)
+        {
+            string content = await response.Content.ReadAsStringAsync();
+            var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
+            string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
+
+            // Trigger the download in the browser
+            await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");
+        }
+        else
+        {
+            _errors.Add(response.StatusCode.ToString());
+        }
+
+        _inProgress = false;
+    }
+}

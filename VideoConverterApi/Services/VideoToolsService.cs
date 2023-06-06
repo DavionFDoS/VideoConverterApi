@@ -166,7 +166,7 @@ public class VideoToolsService : IVideoToolsService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var duration = _mediaMetadataService.GetMediaMetadata(inputFilePath).Duration;
 
-        if (fromInSeconds >= duration || toInSeconds > duration)
+        if (fromInSeconds >= duration || fromInSeconds < 0 || toInSeconds > duration || (toInSeconds - fromInSeconds) < 0)
         {
             return await Task.FromResult<OutputFileArguments?>(null);
         }
@@ -735,11 +735,10 @@ public class VideoToolsService : IVideoToolsService
         var hour = extractSingleFrameArguments.Hour;
         var minute = extractSingleFrameArguments.Minute;
         var second = extractSingleFrameArguments.Second;
-        var framenumber = extractSingleFrameArguments.FrameNumber;
         var metadata = _mediaMetadataService.GetMediaMetadata(inputFilePath);
         var durationInSeconds = ToSeconds(hour, minute, second);
 
-        if (durationInSeconds > metadata.Duration || framenumber > metadata.FrameRate)
+        if (durationInSeconds > metadata.Duration || durationInSeconds < 0)
         {
             return await Task.FromResult<OutputFileArguments?>(null);
         }
