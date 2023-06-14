@@ -14,6 +14,7 @@ builder.Services.AddCors();
 builder.Services.AddScoped<IVideoToolsService, VideoToolsService>();
 builder.Services.AddScoped<IConvertationService, ConvertationService>();
 builder.Services.AddScoped<ISizePrecalculationService, SizePrecalculationService>();
+builder.Services.AddScoped<IUploadsCalculator, UploadsCalculator>();
 
 var app = builder.Build();
 
@@ -207,10 +208,13 @@ app.MapPost("/mergevideos", async Task<OutputFileArguments?> (MergeVideosArgumen
     .WithOpenApi()
     .WithTags("VideoToolsService");
 
-app.MapPost("/precalculatevideosize", (SizeCalculationVariables variables, ISizePrecalculationService sizePrecalculationService) =>
+app.MapPost("/precalculatevideosize", UploadsCalculatorVariables (SizeCalculationVariables variables, ISizePrecalculationService sizePrecalculationService, IUploadsCalculator uploadsCalculator) =>
 {
     var precalculatedSize = sizePrecalculationService.CalculateSize(variables);
-    return precalculatedSize;
+    uploadsCalculator.SizeCalculationVariables = variables;
+    uploadsCalculator.PrecalculatedSize = precalculatedSize;
+
+    return uploadsCalculator.CheckUploadAccessibility();
 })
 .WithName("PrecalculateVideoSize")
 .WithOpenApi()
@@ -220,7 +224,7 @@ app.MapGet("/download", async (string filePath, HttpContext context) =>
 {
     if (File.Exists(filePath))
     {
-        var fileProvider = new PhysicalFileProvider(Path.GetDirectoryName(filePath));
+        var fileProvider = new PhysicalFileProvider(Path.GetDirectoryName(filePath)!);
         var fileInfo = fileProvider.GetFileInfo(Path.GetFileName(filePath));
 
         context.Response.ContentType = "application/octet-stream";

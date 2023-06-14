@@ -7,6 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Icons\discord.svg" />
+    <None Include="wwwroot\Icons\discord_gray.svg" />
+    <None Include="wwwroot\Icons\reddit.svg" />
+    <None Include="wwwroot\Icons\reddit_gray.svg" />
+    <None Include="wwwroot\Icons\telegram.svg" />
+    <None Include="wwwroot\Icons\telegram_gray.svg" />
+    <None Include="wwwroot\Icons\twitter.svg" />
+    <None Include="wwwroot\Icons\twitter_gray.svg" />
+    <None Include="wwwroot\Icons\vk.svg" />
+    <None Include="wwwroot\Icons\vk_gray.svg" />
+    <None Include="wwwroot\Icons\youtube.svg" />
+    <None Include="wwwroot\Icons\youtube_gray.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MatBlazor" Version="2.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\VideoConverterApi\VideoConverterApi.csproj" />
   </ItemGroup>
 

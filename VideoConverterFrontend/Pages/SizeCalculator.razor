@@ -6,8 +6,9 @@
 @using VideoConverterApi.Models;
 
 <PageTitle>Size Calculator</PageTitle>
+<link href="css/styles.css" rel="stylesheet" />
 
-<h3>Size Calculator</h3>
+<h3>Калькулятор размера видеофайла</h3>
 <br />
 
 <div class="form-group">
@@ -33,6 +34,16 @@
             <option value="@value">@value</option>
         }
     </select>
+</div>
+
+<div class="form-group">
+    <label for="fileFormat">Формат файла:</label>
+    <select id="fileFormat" class="form-control" @bind="_fileFormat">
+        @foreach (var value in Enum.GetValues(typeof(FileFormat)))
+        {
+            <option value="@value">@value</option>
+        }
+    </select>
     <br />
 </div>
 
@@ -52,6 +63,67 @@
     </div>
 </div>
 
+<div class="mt-3">
+    <br />
+    <h4>Сервисы для загрузки:</h4>
+    <br />
+    <div>
+        @if (_canbeUploadedToVk)
+        {
+            <img src="Icons/vk.svg" width="16" height="16" style="margin: 10px" />
+        }
+        else
+        {
+            <img src="Icons/vk_gray.svg" width="16" height="16" style="margin: 10px" />
+        }
+
+        @if (_canbeUploadedToTelegram)
+        {
+            <img src="Icons/telegram.svg" width="16" height="16" style="margin: 10px" />
+        }
+        else
+        {
+            <img src="Icons/telegram_gray.svg" width="16" height="16" style="margin: 10px" />
+        }
+
+        @if (_canbeUploadedToReddit)
+        {
+            <img src="Icons/reddit.svg" width="16" height="16" style="margin: 10px" />
+        }
+        else
+        {
+            <img src="Icons/reddit_gray.svg" width="16" height="16" style="margin: 10px" />
+        }
+
+        @if (_canbeUploadedToYoutube)
+        {
+            <img src="Icons/youtube.svg" width="16" height="16" style="margin: 10px" />
+        }
+        else
+        {
+            <img src="Icons/youtube_gray.svg" width="16" height="16" style="margin: 10px" />
+        }
+
+        @if (_canbeUploadedToDiscord)
+        {
+            <img src="Icons/discord.svg" width="16" height="16" style="margin: 10px" />
+        }
+        else
+        {
+            <img src="Icons/discord_gray.svg" width="16" height="16" style="margin: 10px" />
+        }
+
+        @if (_canbeUploadedToTwitter)
+        {
+            <img src="Icons/twitter.svg" width="16" height="16" style="margin: 10px" />
+        }
+        else
+        {
+            <img src="Icons/twitter_gray.svg" width="16" height="16" style="margin: 10px" />
+        }
+    </div>
+</div>
+
 @if (_errors.Count > 0)
 {
     <h2>Errors</h2>
@@ -63,16 +135,22 @@
     </ul>
 }
 
-@code{
+@code {
     private string? _videoBitrateAsString;
     private string? _audioBitrateAsString;
     private double _duration;
     private OverheadFactor _overheadFactor;
-    private int _sizeInBits;
+    private FileFormat _fileFormat;
+    private ulong _sizeInBits;
     private double _sizeInMegabytes;
+    private bool _canbeUploadedToVk;
+    private bool _canbeUploadedToTelegram;
+    private bool _canbeUploadedToReddit;
+    private bool _canbeUploadedToYoutube;
+    private bool _canbeUploadedToDiscord;
+    private bool _canbeUploadedToTwitter;
     private string _apiBaseURL = "https://localhost:44337";
     private List<string> _errors = new();
-
 
     private async Task CalculateSize()
     {
@@ -83,7 +161,8 @@
                 VideoBitrateAsString = _videoBitrateAsString,
                 AudioBitrateAsString = _audioBitrateAsString,
                 Duration = _duration,
-                OverheadFactor = _overheadFactor
+                OverheadFactor = _overheadFactor,
+                FileFormat = _fileFormat
             };
 
         var response = await client.PostAsJsonAsync($"{_apiBaseURL}/precalculatevideosize", arguments);
@@ -91,16 +170,21 @@
         if (response.IsSuccessStatusCode)
         {
             string content = await response.Content.ReadAsStringAsync();
-            _errors.Add(content);
 
             var options = new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 };
 
-            PrecalculatedSize precaculatedSize = JsonSerializer.Deserialize<PrecalculatedSize>(content, options)!;
-            _sizeInBits = precaculatedSize.SizeInBits;
-            _sizeInMegabytes = precaculatedSize.SizeInMegaBytes;
+            UploadsCalculatorVariables uploadsCalculatorVariables = JsonSerializer.Deserialize<UploadsCalculatorVariables>(content, options)!;
+            _sizeInBits = uploadsCalculatorVariables.PrecalculatedSize!.SizeInBits;
+            _sizeInMegabytes = uploadsCalculatorVariables.PrecalculatedSize!.SizeInMegaBytes;
+            _canbeUploadedToVk = uploadsCalculatorVariables.CanBeUploadedToVK;
+            _canbeUploadedToTelegram = uploadsCalculatorVariables.CanBeUploadedToTelegram;
+            _canbeUploadedToReddit = uploadsCalculatorVariables.CanBeUploadedToReddit;
+            _canbeUploadedToYoutube = uploadsCalculatorVariables.CanBeUploadedToYoutube;
+            _canbeUploadedToDiscord = uploadsCalculatorVariables.CanBeUploadedToDiscord;
+            _canbeUploadedToTwitter = uploadsCalculatorVariables.CanBeUploadedToTwitter;
         }
         else
         {

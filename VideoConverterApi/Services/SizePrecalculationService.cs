@@ -14,8 +14,8 @@ public class SizePrecalculationService : ISizePrecalculationService
             return new PrecalculatedSize();
         }
 
-        bool vb = int.TryParse(sizeCalculationVariables.VideoBitrateAsString, out int videoBitrate);
-        bool ab = int.TryParse(sizeCalculationVariables.AudioBitrateAsString, out int audioBitrate);
+        bool vb = ulong.TryParse(sizeCalculationVariables.VideoBitrateAsString, out ulong videoBitrate);
+        bool ab = ulong.TryParse(sizeCalculationVariables.AudioBitrateAsString, out ulong audioBitrate);
 
         if (!vb && !ab)
         {
@@ -25,7 +25,7 @@ public class SizePrecalculationService : ISizePrecalculationService
         var fileSizeInBits = (videoBitrate + audioBitrate) * sizeCalculationVariables.Duration * CalculateOverheadFactor(sizeCalculationVariables.OverheadFactor);
         return new PrecalculatedSize
         {
-            SizeInBits = (int)fileSizeInBits,
+            SizeInBits = (ulong)fileSizeInBits,
             SizeInMegaBytes = ToMegabytes(fileSizeInBits)
         };
     }

@@ -8,4 +8,5 @@ public class SizeCalculationVariables
     public string? AudioBitrateAsString { get; set; }
     public double Duration { get; set; }
     public OverheadFactor OverheadFactor { get; set; }
+    public FileFormat FileFormat { get; set; }
 }
