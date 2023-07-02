@@ -59,9 +59,7 @@
                 InputFileName = InputFileName
             };
 
-        _errors.Add(arguments.InputFileName);
         var response = await client.PostAsJsonAsync($"{_apiBaseURL}/reversevideo", arguments);
-        _errors.Add(response.ToString());
 
         if (response.IsSuccessStatusCode)
         {
