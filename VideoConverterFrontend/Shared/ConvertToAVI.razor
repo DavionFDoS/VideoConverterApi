@@ -128,7 +128,6 @@
                 string content = await response.Content.ReadAsStringAsync();
                 var outputFileName = content.Substring(content.IndexOf(':') + 1).Replace("\"", "").Replace("}", "").Replace("Videos/Uploads/", "");
                 string downloadUrl = $"{_apiBaseURL}/download?filePath={_directoryPath}{outputFileName}";
-                _errors.Add(downloadUrl);
 
                 // Trigger the download in the browser
                 await JsRuntime.InvokeAsync<object>("blazorOpen", downloadUrl, "_blank");

@@ -340,6 +340,15 @@ __pycache__/
 
 # Text files
 *.txt
+*Logs.txt
+
+# Audio files
+*.mp3
+*.acc
+
+# Subtitles files
+*.ass
+*.srt
 
 # Telerik's JustMock configuration file
 *.jmconfig

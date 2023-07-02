@@ -11,5 +11,5 @@ Style: Default,Arial,16,&Hffffff,&Hffffff,&H0,&H0,0,0,0,0,100,100,0,0,1,1,0,2,10
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-Dialogue: 0,0:00:00.00,0:00:03.00,Default,,0,0,0,,Проклятье ты все-таки запостил кринж
-Dialogue: 0,0:00:03.00,0:00:06.00,Default,,0,0,0,,Весь город должен быть уничтожен
+Dialogue: 0,0:00:00.00,0:00:03.00,Default,,0,0,0,,Строчка субтитров 1
+Dialogue: 0,0:00:03.00,0:00:06.00,Default,,0,0,0,,Строчка субтитров 2
