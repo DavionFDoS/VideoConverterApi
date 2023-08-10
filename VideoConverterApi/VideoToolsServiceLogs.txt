@@ -4021,3 +4021,54 @@
 2023-06-28 11:44:40.531 +03:00 [ERR] frame=   63 fps=0.0 q=-1.0 Lsize=     152kB time=00:00:05.99 bitrate= 207.4kbits/s speed= 221x    
 2023-06-28 11:44:40.531 +03:00 [ERR] video:54kB audio:94kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 2.899673%
 2023-06-28 11:44:40.541 +03:00 [INF] Cut video command executed succesfully
+2023-08-09 17:08:14.301 +03:00 [INF] -i Videos/Uploads/1.mp4 -ss 0:0:0 -to 0:9:39 -c copy Videos/Uploads/5f60e0f0-4c2e-4b44-83c1-e0dd9d89d4ff.mp4
+2023-08-09 17:08:20.959 +03:00 [ERR] ffmpeg version N-109079-g3ab11dc5bb-20221114 Copyright (c) 2000-2022 the FFmpeg developers
+2023-08-09 17:08:20.959 +03:00 [ERR]   built with gcc 12.2.0 (crosstool-NG 1.25.0.90_cf9beb1)
+2023-08-09 17:08:20.960 +03:00 [ERR]   configuration: --prefix=/ffbuild/prefix --pkg-config-flags=--static --pkg-config=pkg-config --cross-prefix=x86_64-w64-mingw32- --arch=x86_64 --target-os=mingw32 --enable-gpl --enable-version3 --disable-debug --disable-w32threads --enable-pthreads --enable-iconv --enable-libxml2 --enable-zlib --enable-libfreetype --enable-libfribidi --enable-gmp --enable-lzma --enable-fontconfig --enable-libvorbis --enable-opencl --disable-libpulse --enable-libvmaf --disable-libxcb --disable-xlib --enable-amf --enable-libaom --enable-libaribb24 --enable-avisynth --enable-chromaprint --enable-libdav1d --enable-libdavs2 --disable-libfdk-aac --enable-ffnvcodec --enable-cuda-llvm --enable-frei0r --enable-libgme --enable-libkvazaar --enable-libass --enable-libbluray --enable-libjxl --enable-libmp3lame --enable-libopus --enable-librist --enable-libssh --enable-libtheora --enable-libvpx --enable-libwebp --enable-lv2 --disable-libmfx --enable-libvpl --enable-openal --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopenmpt --enable-librav1e --enable-librubberband --enable-schannel --enable-sdl2 --enable-libsoxr --enable-libsrt --enable-libsvtav1 --enable-libtwolame --enable-libuavs3d --disable-libdrm --disable-vaapi --enable-libvidstab --enable-vulkan --enable-libshaderc --enable-libplacebo --enable-libx264 --enable-libx265 --enable-libxavs2 --enable-libxvid --enable-libzimg --enable-libzvbi --extra-cflags=-DLIBTWOLAME_STATIC --extra-cxxflags= --extra-ldflags=-pthread --extra-ldexeflags= --extra-libs=-lgomp --extra-version=20221114
+2023-08-09 17:08:20.960 +03:00 [ERR]   libavutil      57. 42.100 / 57. 42.100
+2023-08-09 17:08:20.960 +03:00 [ERR]   libavcodec     59. 52.102 / 59. 52.102
+2023-08-09 17:08:20.960 +03:00 [ERR]   libavformat    59. 34.101 / 59. 34.101
+2023-08-09 17:08:20.960 +03:00 [ERR]   libavdevice    59.  8.101 / 59.  8.101
+2023-08-09 17:08:20.960 +03:00 [ERR]   libavfilter     8. 50.100 /  8. 50.100
+2023-08-09 17:08:20.960 +03:00 [ERR]   libswscale      6.  8.112 /  6.  8.112
+2023-08-09 17:08:20.960 +03:00 [ERR]   libswresample   4.  9.100 /  4.  9.100
+2023-08-09 17:08:20.960 +03:00 [ERR]   libpostproc    56.  7.100 / 56.  7.100
+2023-08-09 17:08:21.005 +03:00 [ERR] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'Videos/Uploads/1.mp4':
+2023-08-09 17:08:21.006 +03:00 [ERR]   Metadata:
+2023-08-09 17:08:21.006 +03:00 [ERR]     major_brand     : isom
+2023-08-09 17:08:21.006 +03:00 [ERR]     minor_version   : 512
+2023-08-09 17:08:21.006 +03:00 [ERR]     compatible_brands: isomiso2avc1mp41
+2023-08-09 17:08:21.006 +03:00 [ERR]     encoder         : Lavf59.27.100
+2023-08-09 17:08:21.006 +03:00 [ERR]   Duration: 00:43:30.32, start: 0.000000, bitrate: 180 kb/s
+2023-08-09 17:08:21.006 +03:00 [ERR]   Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1600x900, 108 kb/s, 25 fps, 25 tbr, 12800 tbn (default)
+2023-08-09 17:08:21.006 +03:00 [ERR]     Metadata:
+2023-08-09 17:08:21.006 +03:00 [ERR]       handler_name    : VideoHandler
+2023-08-09 17:08:21.006 +03:00 [ERR]       vendor_id       : [0][0][0][0]
+2023-08-09 17:08:21.006 +03:00 [ERR]       encoder         : Lavc59.37.100 libx264
+2023-08-09 17:08:21.006 +03:00 [ERR]   Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 64 kb/s (default)
+2023-08-09 17:08:21.006 +03:00 [ERR]     Metadata:
+2023-08-09 17:08:21.006 +03:00 [ERR]       handler_name    : SoundHandler
+2023-08-09 17:08:21.007 +03:00 [ERR]       vendor_id       : [0][0][0][0]
+2023-08-09 17:08:21.008 +03:00 [ERR] Output #0, mp4, to 'Videos/Uploads/5f60e0f0-4c2e-4b44-83c1-e0dd9d89d4ff.mp4':
+2023-08-09 17:08:21.009 +03:00 [ERR]   Metadata:
+2023-08-09 17:08:21.009 +03:00 [ERR]     major_brand     : isom
+2023-08-09 17:08:21.009 +03:00 [ERR]     minor_version   : 512
+2023-08-09 17:08:21.009 +03:00 [ERR]     compatible_brands: isomiso2avc1mp41
+2023-08-09 17:08:21.009 +03:00 [ERR]     encoder         : Lavf59.34.101
+2023-08-09 17:08:21.009 +03:00 [ERR]   Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 1600x900, q=2-31, 108 kb/s, 25 fps, 25 tbr, 12800 tbn (default)
+2023-08-09 17:08:21.009 +03:00 [ERR]     Metadata:
+2023-08-09 17:08:21.009 +03:00 [ERR]       handler_name    : VideoHandler
+2023-08-09 17:08:21.009 +03:00 [ERR]       vendor_id       : [0][0][0][0]
+2023-08-09 17:08:21.009 +03:00 [ERR]       encoder         : Lavc59.37.100 libx264
+2023-08-09 17:08:21.009 +03:00 [ERR]   Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 64 kb/s (default)
+2023-08-09 17:08:21.009 +03:00 [ERR]     Metadata:
+2023-08-09 17:08:21.009 +03:00 [ERR]       handler_name    : SoundHandler
+2023-08-09 17:08:21.009 +03:00 [ERR]       vendor_id       : [0][0][0][0]
+2023-08-09 17:08:21.009 +03:00 [ERR] Stream mapping:
+2023-08-09 17:08:21.009 +03:00 [ERR]   Stream #0:0 -> #0:0 (copy)
+2023-08-09 17:08:21.009 +03:00 [ERR]   Stream #0:1 -> #0:1 (copy)
+2023-08-09 17:08:21.009 +03:00 [ERR] Press [q] to stop, [?] for help
+2023-08-09 17:08:21.009 +03:00 [ERR] frame=    0 fps=0.0 q=-1.0 size=       0kB time=-577014:32:22.77 bitrate=  -0.0kbits/s speed=N/A    
+2023-08-09 17:08:21.446 +03:00 [ERR] frame=14422 fps=0.0 q=-1.0 Lsize=   13571kB time=00:09:38.99 bitrate= 192.0kbits/s speed=1.34e+03x    
+2023-08-09 17:08:21.447 +03:00 [ERR] video:8468kB audio:4591kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 3.918753%
+2023-08-09 17:08:21.475 +03:00 [INF] Cut video command executed succesfully

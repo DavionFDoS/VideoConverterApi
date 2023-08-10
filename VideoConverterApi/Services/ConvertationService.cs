@@ -19,7 +19,7 @@ public class ConvertationService : IConvertationService
     public ConvertationService()
     {
         _logger = new LoggerConfiguration()
-            .WriteTo.File("ConvertionServiceLogs.txt")
+            .WriteTo.File("ConvertationServiceLogs.txt")
             .CreateLogger();
     }
 
