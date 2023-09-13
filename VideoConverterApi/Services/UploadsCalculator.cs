@@ -90,7 +90,6 @@ public class UploadsCalculator : IUploadsCalculator
 
     private bool CanUploadToTelegram()
     {
-        bool acceptableVideoBitrate;
         bool acceptableFileSize;
         ulong maxFileSixe = 17179869184;  //2gb
 
@@ -200,7 +199,7 @@ public class UploadsCalculator : IUploadsCalculator
             acceptableFileSize = true;
         }
 
-        if (SizeCalculationVariables.Duration > maxDuration || SizeCalculationVariables.Duration < minDuration)
+        if (SizeCalculationVariables?.Duration > maxDuration || SizeCalculationVariables?.Duration < minDuration)
         {
             return false;
         }
