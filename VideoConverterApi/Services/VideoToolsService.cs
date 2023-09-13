@@ -780,7 +780,7 @@ public class VideoToolsService : IVideoToolsService
         var extension = inputFileName?[(inputFileName.IndexOf('.') + 1)..];
         var videosToMerge = mergeVideosArguments.VideosToMerge;
 
-        if(videosToMerge is null)
+        if (videosToMerge is null)
         {
             return await Task.FromResult<OutputFileArguments?>(null);
         }

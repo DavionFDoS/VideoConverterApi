@@ -1,14 +1,10 @@
-﻿using VideoConverterApi.Models;
-using CliWrap;
+﻿using CliWrap;
 using CliWrap.Buffered;
 using Serilog;
-using VideoConverterApi.Interfaces;
-using Microsoft.OpenApi.Extensions;
-using VideoConverterApi.Enums;
-using VideoConverterApi.Extensions;
-using System;
-using System.Runtime.Intrinsics.X86;
 using System.IO.Compression;
+using VideoConverterApi.Extensions;
+using VideoConverterApi.Interfaces;
+using VideoConverterApi.Models;
 
 namespace VideoConverterApi.Services;
 
@@ -49,7 +45,7 @@ public class ConvertationService : IConvertationService
         var guid = Guid.NewGuid();
         var outputFileName = $"{_videosFolderName}{guid}.mp4";
 
-        var cmd = WrapCommand($"-i {inputFilePath} {outputFileName}");        
+        var cmd = WrapCommand($"-i {inputFilePath} {outputFileName}");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -84,7 +80,7 @@ public class ConvertationService : IConvertationService
 
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
         var guid = Guid.NewGuid();
-        var outputFileName = $"{ _videosFolderName }{ guid}.avi";
+        var outputFileName = $"{_videosFolderName}{guid}.avi";
 
         var cmd = WrapCommand($"-i {inputFilePath} {outputFileName}");
 
@@ -270,7 +266,7 @@ public class ConvertationService : IConvertationService
         var guid = Guid.NewGuid();
         var outputFileName = $"{_videosFolderName}{guid}.3gp";
 
-        var cmd = WrapCommand($"-i {inputFilePath} -c:v libx264 -b:v 512k -c:a aac -b:a 128k -ar 8000 -ac 1 {outputFileName}");      
+        var cmd = WrapCommand($"-i {inputFilePath} -c:v libx264 -b:v 512k -c:a aac -b:a 128k -ar 8000 -ac 1 {outputFileName}");
 
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
@@ -420,7 +416,7 @@ public class ConvertationService : IConvertationService
         var inputFilePath = $"{_videosFolderName}{inputFileName}";
 
         var cmd = WrapCommand($"-i {inputFilePath} -vf fps={numberOfImages}/{perNumberOfSeconds} {_videosFolderName}image_%03d.png");
-        
+
         var cmdResult = await cmd.ExecuteBufferedAsync();
 
         if (cmdResult.ExitCode != 0)
@@ -432,7 +428,7 @@ public class ConvertationService : IConvertationService
         _logger.Information("Convert to series of images command executed succesfully");
 
         string[] images = Directory
-            .GetFiles($"{ _videosFolderName}", $"image_*.png");
+            .GetFiles($"{_videosFolderName}", $"image_*.png");
 
         var guid = Guid.NewGuid();
         var zipPath = $"{_videosFolderName}{guid}.zip";
@@ -495,7 +491,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to MP4 with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
+            _logger.Error("Error executing convert to MP4 with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -549,7 +545,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to AVI with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
+            _logger.Error("Error executing convert to AVI with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -601,7 +597,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to WebM with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
+            _logger.Error("Error executing convert to WebM with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
 
@@ -652,7 +648,7 @@ public class ConvertationService : IConvertationService
 
         if (cmdResult.ExitCode != 0)
         {
-            _logger.Error("Error executing convert to MOV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);           
+            _logger.Error("Error executing convert to MOV with arguments command. Exit code: {ExitCode}", cmdResult.ExitCode);
             throw new Exception("Error executing ffmpeg command");
         }
 
